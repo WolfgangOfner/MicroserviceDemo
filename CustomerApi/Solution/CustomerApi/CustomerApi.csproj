@@ -39,4 +39,10 @@
     <ProjectReference Include="..\CustomerApi.Service\CustomerApi.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Infrastructure\Certificate\cert-aspnetcore.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
