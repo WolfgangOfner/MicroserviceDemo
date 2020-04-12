@@ -19,11 +19,15 @@ namespace OrderApi.Messaging.Receive.Receiver.v1
         private readonly ICustomerNameUpdateService _customerNameUpdateService;
         private readonly string _hostname;
         private readonly string _queueName;
+        private readonly string _username;
+        private readonly string _password;
 
         public CustomerFullNameUpdateReceiver(ICustomerNameUpdateService customerNameUpdateService, IOptions<RabbitMqConfiguration> rabbitMqOptions)
         {
             _hostname = rabbitMqOptions.Value.Hostname;
             _queueName = rabbitMqOptions.Value.QueueName;
+            _username = rabbitMqOptions.Value.UserName;
+            _password = rabbitMqOptions.Value.Password;
             _customerNameUpdateService = customerNameUpdateService;
             InitializeRabbitMqListener();
         }
@@ -32,7 +36,9 @@ namespace OrderApi.Messaging.Receive.Receiver.v1
         {
             var factory = new ConnectionFactory
             {
-                HostName = _hostname
+                HostName = _hostname,
+                UserName = _username,
+                Password = _password
             };
 
             _connection = factory.CreateConnection();

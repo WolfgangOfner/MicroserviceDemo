@@ -1,0 +1,45 @@
+version: "3.6"
+services:
+    rabbitmq:
+        container_name: rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            - RABBITMQ_DEFAULT_USER=user
+            - RABBITMQ_DEFAULT_PASS=password        
+        image: rabbitmq:3-management
+                
+    hello-customer:
+        container_name: customer
+        ports:
+            - 8000:80
+            - 8001:443
+        environment:
+            - ASPNETCORE_HTTPS_PORT=5001
+            - "ASPNETCORE_URLS=https://+;http://+"
+            - Kestrel__Certificates__Default__Path=/root/.dotnet/https/cert-aspnetcore.pfx
+            - Kestrel__Certificates__Default__Password=ufo
+        volumes:
+            - C:\temp\:/root/.dotnet/https
+        image: hello-customer   
+        restart: on-failure        
+        depends_on:
+            - rabbitmq
+        
+    hello-order:
+        container_name: order
+        ports:
+            - 9000:80
+            - 9001:443
+        environment:
+            - ASPNETCORE_HTTPS_PORT=5001
+            - "ASPNETCORE_URLS=https://+;http://+"
+            - Kestrel__Certificates__Default__Path=/root/.dotnet/https/cert-aspnetcore.pfx
+            - Kestrel__Certificates__Default__Password=ufo
+        volumes:
+            - C:\temp\:/root/.dotnet/https
+        image: hello-order        
+        restart: on-failure
+        depends_on:
+            - rabbitmq            
