@@ -1,0 +1,43 @@
+version: "3.6"
+services:
+    rabbitmq:
+        container_name: rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            - RABBITMQ_DEFAULT_USER=user
+            - RABBITMQ_DEFAULT_PASS=password        
+        image: rabbitmq:3-management
+                
+    customerapi:
+        container_name: customerapi
+        ports:
+            - 8000:80
+            - 8001:443
+        environment:
+            - ASPNETCORE_HTTPS_PORT=5001
+            - "ASPNETCORE_URLS=https://+;http://+"
+            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+            - Kestrel__Certificates__Default__Password=SecretPassword        
+        build:
+            context: ./CustomerApi      
+        restart: on-failure        
+        depends_on:
+            - rabbitmq
+        
+    orderapi:
+        container_name: order
+        ports:
+            - 9000:80
+            - 9001:443
+        environment:
+            - ASPNETCORE_HTTPS_PORT=5001
+            - "ASPNETCORE_URLS=https://+;http://+"
+            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+            - Kestrel__Certificates__Default__Password=SecretPassword       
+        build:
+            context: ./OrderApi      
+        restart: on-failure
+        depends_on:
+            - rabbitmq            
