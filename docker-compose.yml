@@ -16,7 +16,6 @@ services:
             - 8000:80
             - 8001:443
         environment:
-            - ASPNETCORE_HTTPS_PORT=5001
             - "ASPNETCORE_URLS=https://+;http://+"
             - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
             - Kestrel__Certificates__Default__Password=SecretPassword        
@@ -31,7 +30,6 @@ services:
             - 9000:80
             - 9001:443
         environment:
-            - ASPNETCORE_HTTPS_PORT=5001
             - "ASPNETCORE_URLS=https://+;http://+"
             - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
             - Kestrel__Certificates__Default__Password=SecretPassword       
