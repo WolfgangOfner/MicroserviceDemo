@@ -29,15 +29,15 @@ namespace CustomerApi.Data.Database
                     FirstName = "Darth",
                     LastName = "Vader",
                     Birthday = new DateTime(1977, 05, 25),
-                    Age = 42
+                    Age = 43
                 },
                 new Customer
                 {
                     Id = Guid.Parse("971316e1-4966-4426-b1ea-a36c9dde1066"),
                     FirstName = "Son",
                     LastName = "Goku",
-                    Birthday = new DateTime(737, 04, 16),
-                    Age = 1282
+                    Birthday = new DateTime(1937, 04, 16),
+                    Age = 83
                 }
             };
 
