@@ -30,9 +30,9 @@ namespace CustomerApi.Controllers.v1
         /// </summary>
         /// <param name="createCustomerModel">Model to create a new customer</param>
         /// <returns>Returns the created customer</returns>
-        /// /// <response code="200">Returned if the customer was created</response>
-        /// /// <response code="400">Returned if the model couldn't be parsed or the customer couldn't be saved</response>
-        /// /// <response code="422">Returned when the validation failed</response>
+        /// <response code="200">Returned if the customer was created</response>
+        /// <response code="400">Returned if the model couldn't be parsed or the customer couldn't be saved</response>
+        /// <response code="422">Returned when the validation failed</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
@@ -57,9 +57,9 @@ namespace CustomerApi.Controllers.v1
         /// </summary>
         /// <param name="updateCustomerModel">Model to update an existing customer</param>
         /// <returns>Returns the updated customer</returns>
-        /// /// <response code="200">Returned if the customer was updated</response>
-        /// /// <response code="400">Returned if the model couldn't be parsed or the customer couldn't be found</response>
-        /// /// <response code="422">Returned when the validation failed</response>
+        /// <response code="200">Returned if the customer was updated</response>
+        /// <response code="400">Returned if the model couldn't be parsed or the customer couldn't be found</response>
+        /// <response code="422">Returned when the validation failed</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
