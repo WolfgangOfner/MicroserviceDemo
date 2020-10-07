@@ -57,7 +57,7 @@ namespace CustomerApi
                     Contact = new OpenApiContact
                     {
                         Name = "Wolfgang Ofner",
-                        Email = "WolfgangOfner@aon.at",
+                        Email = "WolfgangOfner@programmingwithwolfgang.com",
                         Url = new Uri("https://www.programmingwithwolfgang.com/")
                     }
                 });
