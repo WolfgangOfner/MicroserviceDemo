@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Solution\CustomerApi.Service\CustomerApi.Service.csproj" />
+    <ProjectReference Include="..\..\CustomerApi.Service\CustomerApi.Service.csproj" />
   </ItemGroup>
 
 </Project>

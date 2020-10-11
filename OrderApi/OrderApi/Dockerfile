@@ -7,14 +7,14 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["Solution/OrderApi/OrderApi.csproj", "Solution/OrderApi/"]
-COPY ["Solution/OrderApi.Data/OrderApi.Data.csproj", "Solution/OrderApi.Data/"]
-COPY ["Solution/OrderApi.Domain/OrderApi.Domain.csproj", "Solution/OrderApi.Domain/"]
-COPY ["Solution/OrderApi.Service/OrderApi.Service.csproj", "Solution/OrderApi.Service/"]
-COPY ["Solution/OrderApi.Messaging.Receive/OrderApi.Messaging.Receive.csproj", "Solution/OrderApi.Messaging.Receive/"]
-RUN dotnet restore "Solution/OrderApi/OrderApi.csproj"
+COPY ["OrderApi/OrderApi.csproj", "OrderApi/"]
+COPY ["OrderApi.Data/OrderApi.Data.csproj", "OrderApi.Data/"]
+COPY ["OrderApi.Domain/OrderApi.Domain.csproj", "OrderApi.Domain/"]
+COPY ["OrderApi.Service/OrderApi.Service.csproj", "OrderApi.Service/"]
+COPY ["OrderApi.Messaging.Receive/OrderApi.Messaging.Receive.csproj", "OrderApi.Messaging.Receive/"]
+RUN dotnet restore "OrderApi/OrderApi.csproj"
 COPY . .
-WORKDIR "/src/Solution/OrderApi"
+WORKDIR "/src/OrderApi"
 RUN dotnet build "OrderApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

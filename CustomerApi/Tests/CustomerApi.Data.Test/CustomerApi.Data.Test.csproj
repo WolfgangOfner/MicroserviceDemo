@@ -23,8 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Solution\CustomerApi.Data\CustomerApi.Data.csproj" />
-    <ProjectReference Include="..\..\Solution\CustomerApi.Domain\CustomerApi.Domain.csproj" />
+    <ProjectReference Include="..\..\CustomerApi.Data\CustomerApi.Data.csproj" />
   </ItemGroup>
 
 </Project>

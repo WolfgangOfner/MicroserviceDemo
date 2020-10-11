@@ -21,11 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Solution\OrderApi.Service\OrderApi.Service.csproj" />
+    <Folder Include="v1\Services\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="v1\Services\" />
+    <ProjectReference Include="..\..\OrderApi.Service\OrderApi.Service.csproj" />
   </ItemGroup>
 
 </Project>
