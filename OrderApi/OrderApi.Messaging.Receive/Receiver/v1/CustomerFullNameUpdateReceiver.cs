@@ -54,7 +54,7 @@ namespace OrderApi.Messaging.Receive.Receiver.v1
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (ch, ea) =>
             {
-                var content = Encoding.UTF8.GetString(ea.Body);
+                var content = Encoding.UTF8.GetString(ea.Body.ToArray());
                 var updateCustomerFullNameModel = JsonConvert.DeserializeObject<UpdateCustomerFullNameModel>(content);
 
                 HandleMessage(updateCustomerFullNameModel);

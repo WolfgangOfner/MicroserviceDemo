@@ -20,7 +20,8 @@ services:
             - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
             - Kestrel__Certificates__Default__Password=SecretPassword        
         build:
-            context: ./CustomerApi      
+            context: ./CustomerApi
+            dockerfile: CustomerApi/Dockerfile
         restart: on-failure        
         depends_on:
             - rabbitmq
@@ -36,6 +37,7 @@ services:
             - Kestrel__Certificates__Default__Password=SecretPassword       
         build:
             context: ./OrderApi      
+            dockerfile: OrderApi/Dockerfile
         restart: on-failure
         depends_on:
             - rabbitmq            
