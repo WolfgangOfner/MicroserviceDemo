@@ -8,16 +8,16 @@ namespace OrderApi.Service.v1.Command
 {
     public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Order>
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
 
-        public CreateOrderCommandHandler(IRepository<Order> repository)
+        public CreateOrderCommandHandler(IOrderRepository orderRepository)
         {
-            _repository = repository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<Order> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            return await _repository.AddAsync(request.Order);
+            return await _orderRepository.AddAsync(request.Order);
         }
     }
 }

@@ -10,12 +10,12 @@ namespace OrderApi.Service.Test.v1.Command
     public class UpdateOrderCommandHandlerTests
     {
         private readonly UpdateOrderCommandHandler _testee;
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
 
         public UpdateOrderCommandHandlerTests()
         {
-            _repository = A.Fake<IRepository<Order>>();
-            _testee = new UpdateOrderCommandHandler(_repository);
+            _orderRepository = A.Fake<IOrderRepository>();
+            _testee = new UpdateOrderCommandHandler(_orderRepository);
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace OrderApi.Service.Test.v1.Command
         {
             await _testee.Handle(new UpdateOrderCommand(), default);
 
-            A.CallTo(() => _repository.UpdateRangeAsync(A<List<Order>>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _orderRepository.UpdateRangeAsync(A<List<Order>>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

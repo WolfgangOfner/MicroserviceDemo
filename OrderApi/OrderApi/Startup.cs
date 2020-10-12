@@ -89,6 +89,7 @@ namespace OrderApi
             services.AddMediatR(Assembly.GetExecutingAssembly(), typeof(ICustomerNameUpdateService).Assembly);
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IOrderRepository, OrderRepository>();
 
             services.AddTransient<IValidator<OrderModel>, OrderModelValidator>();
             

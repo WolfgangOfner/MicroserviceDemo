@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using OrderApi.Data.Repository.v1;
 using OrderApi.Domain;
 
@@ -10,16 +8,17 @@ namespace OrderApi.Service.v1.Query
 {
     public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Order>
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
 
-        public GetOrderByIdQueryHandler(IRepository<Order> repository)
+        public GetOrderByIdQueryHandler(IOrderRepository orderRepository)
         {
-            _repository = repository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<Order> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _repository.GetAll().FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            // todo tests
+            return await _orderRepository.GetOrderByIdAsync(request.Id, cancellationToken);
         }
     }
 }

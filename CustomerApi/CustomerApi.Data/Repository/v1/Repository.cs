@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CustomerApi.Data.Database;
 
@@ -7,22 +7,22 @@ namespace CustomerApi.Data.Repository.v1
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {
-        private readonly CustomerContext _customerContext;
+        protected readonly CustomerContext CustomerContext;
 
         public Repository(CustomerContext customerContext)
         {
-            _customerContext = customerContext;
+            CustomerContext = customerContext;
         }
 
-        public IQueryable<TEntity> GetAll()
+        public IEnumerable<TEntity> GetAll()
         {
             try
             {
-                return _customerContext.Set<TEntity>();
+                return CustomerContext.Set<TEntity>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("Couldn't retrieve entities");
+                throw new Exception($"Couldn't retrieve entities: {ex.Message}");
             }
         }
 
@@ -35,14 +35,14 @@ namespace CustomerApi.Data.Repository.v1
 
             try
             {
-                await _customerContext.AddAsync(entity);
-                await _customerContext.SaveChangesAsync();
+                await CustomerContext.AddAsync(entity);
+                await CustomerContext.SaveChangesAsync();
 
                 return entity;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be saved");
+                throw new Exception($"{nameof(entity)} could not be saved: {ex.Message}");
             }
         }
 
@@ -55,14 +55,14 @@ namespace CustomerApi.Data.Repository.v1
 
             try
             {
-                _customerContext.Update(entity);
-                await _customerContext.SaveChangesAsync();
+                CustomerContext.Update(entity);
+                await CustomerContext.SaveChangesAsync();
 
                 return entity;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be updated");
+                throw new Exception($"{nameof(entity)} could not be updated {ex.Message}");
             }
         }
     }

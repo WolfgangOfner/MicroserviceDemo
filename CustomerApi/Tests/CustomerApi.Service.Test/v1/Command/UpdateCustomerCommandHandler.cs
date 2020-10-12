@@ -11,15 +11,15 @@ namespace CustomerApi.Service.Test.v1.Command
     public class UpdateCustomerCommandHandlerTests
     {
         private readonly UpdateCustomerCommandHandler _testee;
-        private readonly IRepository<Customer> _repository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly ICustomerUpdateSender _customerUpdateSender;
         private readonly Customer _customer;
 
         public UpdateCustomerCommandHandlerTests()
         {
-            _repository = A.Fake<IRepository<Customer>>();
+            _customerRepository = A.Fake<ICustomerRepository>();
             _customerUpdateSender = A.Fake<ICustomerUpdateSender>();
-            _testee = new UpdateCustomerCommandHandler(_repository, _customerUpdateSender);
+            _testee = new UpdateCustomerCommandHandler(_customerUpdateSender, _customerRepository);
 
             _customer = new Customer
             {
@@ -30,7 +30,7 @@ namespace CustomerApi.Service.Test.v1.Command
         [Fact]
         public async void Handle_ShouldCallCustomerUpdaterSenderSendCustomer()
         {
-            A.CallTo(() => _repository.UpdateAsync(A<Customer>._)).Returns(_customer);
+            A.CallTo(() => _customerRepository.UpdateAsync(A<Customer>._)).Returns(_customer);
 
             await _testee.Handle(new UpdateCustomerCommand(), default);
 
@@ -40,7 +40,7 @@ namespace CustomerApi.Service.Test.v1.Command
         [Fact]
         public async void Handle_ShouldReturnUpdatedCustomer()
         {
-            A.CallTo(() => _repository.UpdateAsync(A<Customer>._)).Returns(_customer);
+            A.CallTo(() => _customerRepository.UpdateAsync(A<Customer>._)).Returns(_customer);
 
             var result = await _testee.Handle(new UpdateCustomerCommand(), default);
 
@@ -53,7 +53,7 @@ namespace CustomerApi.Service.Test.v1.Command
         {
             await _testee.Handle(new UpdateCustomerCommand(), default);
 
-            A.CallTo(() => _repository.UpdateAsync(A<Customer>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _customerRepository.UpdateAsync(A<Customer>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

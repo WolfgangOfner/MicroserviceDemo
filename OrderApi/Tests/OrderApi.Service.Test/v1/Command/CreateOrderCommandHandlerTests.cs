@@ -9,19 +9,19 @@ namespace OrderApi.Service.Test.v1.Command
 {
     public class CreateOrderCommandHandlerTests
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
         private readonly CreateOrderCommandHandler _testee;
 
         public CreateOrderCommandHandlerTests()
         {
-            _repository = A.Fake<IRepository<Order>>();
-            _testee = new CreateOrderCommandHandler(_repository);
+            _orderRepository = A.Fake<IOrderRepository>();
+            _testee = new CreateOrderCommandHandler(_orderRepository);
         }
 
         [Fact]
         public async void Handle_ShouldReturnCreatedOrder()
         {
-            A.CallTo(() => _repository.AddAsync(A<Order>._)).Returns(new Order { CustomerFullName = "Bruce Wayne" });
+            A.CallTo(() => _orderRepository.AddAsync(A<Order>._)).Returns(new Order { CustomerFullName = "Bruce Wayne" });
 
             var result = await _testee.Handle(new CreateOrderCommand(), default);
 
@@ -34,7 +34,7 @@ namespace OrderApi.Service.Test.v1.Command
         {
             await _testee.Handle(new CreateOrderCommand(), default);
 
-            A.CallTo(() => _repository.AddAsync(A<Order>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _orderRepository.AddAsync(A<Order>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

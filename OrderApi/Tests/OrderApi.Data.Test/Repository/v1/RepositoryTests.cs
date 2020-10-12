@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using OrderApi.Data.Database;
 using OrderApi.Data.Repository.v1;
 using OrderApi.Data.Test.Infrastructure;
@@ -45,6 +44,18 @@ namespace OrderApi.Data.Test.Repository.v1
             result.CustomerFullName.Should().Be(newOrderFullName);
         }
 
+        [Theory]
+        [InlineData("Changed")]
+        public async void UpdateOrderAsync_WhenOrdersIsNotNull_ShouldUpdateOrders(string newOrderFullName)
+        {
+            var orders = _testee.GetAll().ToList();
+            orders.ForEach(x => x.CustomerFullName = newOrderFullName);
+
+            await _testee.UpdateRangeAsync(orders);
+
+            Context.Order.All(x => x.CustomerFullName == newOrderFullName).Should().BeTrue();
+        }
+
         [Fact]
         public void AddAsync_WhenEntityIsNull_ThrowsException()
         {
@@ -56,7 +67,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.AddAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be saved");
+            _testeeFake.Invoking(x => x.AddAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be saved Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
@@ -82,7 +93,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.Set<Order>()).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.GetAll()).Should().Throw<Exception>().WithMessage("Couldn't retrieve entities");
+            _testeeFake.Invoking(x => x.GetAll()).Should().Throw<Exception>().WithMessage("Couldn't retrieve entities Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
@@ -96,7 +107,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.UpdateAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be updated");
+            _testeeFake.Invoking(x => x.UpdateAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be updated Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
@@ -110,19 +121,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.UpdateRangeAsync(new List<Order>())).Should().Throw<Exception>().WithMessage("entities could not be updated");
-        }
-
-        [Theory]
-        [InlineData("Changed")]
-        public async void UpdateOrderAsync_WhenOrdersIsNotNull_ShouldUpdateOrders(string newOrderFullName)
-        {
-            var orders = _testee.GetAll().ToList();
-            orders.ForEach(x => x.CustomerFullName = newOrderFullName);
-
-            await _testee.UpdateRangeAsync(orders);
-
-            (Context.Order.All(x => x.CustomerFullName == newOrderFullName)).Should().BeTrue();
+            _testeeFake.Invoking(x => x.UpdateRangeAsync(new List<Order>())).Should().Throw<Exception>().WithMessage("entities could not be updated Exception of type 'System.Exception' was thrown.");
         }
     }
 }

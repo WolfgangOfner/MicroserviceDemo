@@ -22,7 +22,7 @@ namespace OrderApi.Service.v1.Services
             {
                 var ordersOfCustomer = await _mediator.Send(new GetOrderByCustomerGuidQuery
                 {
-                    CustomerCuid = updateCustomerFullNameModel.Id
+                    CustomerId = updateCustomerFullNameModel.Id
                 });
 
                 if (ordersOfCustomer.Count != 0)

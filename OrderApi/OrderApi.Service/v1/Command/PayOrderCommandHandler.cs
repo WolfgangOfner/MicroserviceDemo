@@ -8,16 +8,16 @@ namespace OrderApi.Service.v1.Command
 {
     public class PayOrderCommandHandler : IRequestHandler<PayOrderCommand, Order>
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
 
-        public PayOrderCommandHandler(IRepository<Order> repository)
+        public PayOrderCommandHandler(IOrderRepository orderRepository)
         {
-            _repository = repository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<Order> Handle(PayOrderCommand request, CancellationToken cancellationToken)
         {
-            return await _repository.UpdateAsync(request.Order);
+            return await _orderRepository.UpdateAsync(request.Order);
         }
     }
 }

@@ -9,13 +9,13 @@ namespace OrderApi.Service.Test.v1.Command
 {
     public class PayOrderCommandHandlerTests
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
         private readonly PayOrderCommandHandler _testee;
 
         public PayOrderCommandHandlerTests()
         {
-            _repository = A.Fake<IRepository<Order>>();
-            _testee = new PayOrderCommandHandler(_repository);
+            _orderRepository = A.Fake<IOrderRepository>();
+            _testee = new PayOrderCommandHandler(_orderRepository);
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace OrderApi.Service.Test.v1.Command
             {
                 CustomerFullName = "Bruce Wayne"
             };
-            A.CallTo(() => _repository.UpdateAsync(A<Order>._)).Returns(order);
+            A.CallTo(() => _orderRepository.UpdateAsync(A<Order>._)).Returns(order);
 
             var result = await _testee.Handle(new PayOrderCommand(), default);
 
@@ -38,7 +38,7 @@ namespace OrderApi.Service.Test.v1.Command
         {
             await _testee.Handle(new PayOrderCommand(), default);
 
-            A.CallTo(() => _repository.UpdateAsync(A<Order>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _orderRepository.UpdateAsync(A<Order>._)).MustHaveHappenedOnceExactly();
         }
     }
 }

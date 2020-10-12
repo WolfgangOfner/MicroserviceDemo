@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using OrderApi.Data.Database;
 
@@ -8,22 +7,22 @@ namespace OrderApi.Data.Repository.v1
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {
-        private readonly OrderContext _orderContext;
+        protected readonly OrderContext OrderContext;
 
         public Repository(OrderContext orderContext)
         {
-            _orderContext = orderContext;
+            OrderContext = orderContext;
         }
 
-        public IQueryable<TEntity> GetAll()
+        public IEnumerable<TEntity> GetAll()
         {
             try
             {
-                return _orderContext.Set<TEntity>();
+                return OrderContext.Set<TEntity>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("Couldn't retrieve entities");
+                throw new Exception($"Couldn't retrieve entities {ex.Message}");
             }
         }
 
@@ -36,14 +35,14 @@ namespace OrderApi.Data.Repository.v1
 
             try
             {
-                await _orderContext.AddAsync(entity);
-                await _orderContext.SaveChangesAsync();
+                await OrderContext.AddAsync(entity);
+                await OrderContext.SaveChangesAsync();
 
                 return entity;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be saved");
+                throw new Exception($"{nameof(entity)} could not be saved {ex.Message}");
             }
         }
 
@@ -56,14 +55,14 @@ namespace OrderApi.Data.Repository.v1
 
             try
             {
-                _orderContext.Update(entity);
-                await _orderContext.SaveChangesAsync();
+                OrderContext.Update(entity);
+                await OrderContext.SaveChangesAsync();
 
                 return entity;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be updated");
+                throw new Exception($"{nameof(entity)} could not be updated {ex.Message}");
             }
         }
 
@@ -76,12 +75,12 @@ namespace OrderApi.Data.Repository.v1
 
             try
             {
-                _orderContext.UpdateRange(entities);
-                await _orderContext.SaveChangesAsync();
+                OrderContext.UpdateRange(entities);
+                await OrderContext.SaveChangesAsync();
             }
-            catch (Exception )
+            catch (Exception ex)
             {
-                throw new Exception($"{nameof(entities)} could not be updated");
+                throw new Exception($"{nameof(entities)} could not be updated {ex.Message}");
             }
         }
     }

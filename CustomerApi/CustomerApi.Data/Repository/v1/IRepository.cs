@@ -1,11 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CustomerApi.Data.Repository.v1
 {
     public interface IRepository<TEntity> where TEntity : class, new()
     {
-        IQueryable<TEntity> GetAll();
+        IEnumerable<TEntity> GetAll();
 
         Task<TEntity> AddAsync(TEntity entity);
 

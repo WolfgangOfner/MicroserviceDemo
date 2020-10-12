@@ -87,6 +87,7 @@ namespace CustomerApi
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
 
             services.AddTransient<IValidator<CreateCustomerModel>, CreateCustomerModelValidator>();
             services.AddTransient<IValidator<UpdateCustomerModel>, UpdateCustomerModelValidator>();

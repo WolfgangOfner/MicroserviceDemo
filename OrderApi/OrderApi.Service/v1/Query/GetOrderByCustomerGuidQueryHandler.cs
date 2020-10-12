@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using OrderApi.Data.Repository.v1;
 using OrderApi.Domain;
 
@@ -11,16 +11,17 @@ namespace OrderApi.Service.v1.Query
 {
     public class GetOrderByCustomerGuidQueryHandler : IRequestHandler<GetOrderByCustomerGuidQuery, List<Order>>
     {
-        private readonly IRepository<Order> _repository;
+        private readonly IOrderRepository _orderRepository;
 
-        public GetOrderByCustomerGuidQueryHandler(IRepository<Order> repository)
+        public GetOrderByCustomerGuidQueryHandler(IOrderRepository orderRepository)
         {
-            _repository = repository;
+            _orderRepository = orderRepository;
         }
 
         public async Task<List<Order>> Handle(GetOrderByCustomerGuidQuery request, CancellationToken cancellationToken)
         {
-            return await _repository.GetAll().Where(x => x.CustomerGuid == request.CustomerCuid).ToListAsync(cancellationToken);
+            // todo tests
+            return await _orderRepository.GetOrderByCustomerGuidAsync(request.CustomerId, cancellationToken);
         }
     }
 }

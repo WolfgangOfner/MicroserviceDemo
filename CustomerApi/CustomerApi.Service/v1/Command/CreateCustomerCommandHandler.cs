@@ -8,16 +8,17 @@ namespace CustomerApi.Service.v1.Command
 {
     public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, Customer>
     {
-        private readonly IRepository<Customer> _repository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public CreateCustomerCommandHandler(IRepository<Customer> repository)
+        public CreateCustomerCommandHandler(ICustomerRepository customerRepository)
         {
-            _repository = repository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<Customer> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            return await _repository.AddAsync(request.Customer);
+            // todo tests
+            return await _customerRepository.AddAsync(request.Customer);
         }
     }
 }
