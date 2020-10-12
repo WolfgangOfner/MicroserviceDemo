@@ -11,7 +11,6 @@ namespace OrderApi.Data.Repository.v1
 {
     public class OrderRepository : Repository<Order>, IOrderRepository
     {
-        // todo tests
         public OrderRepository(OrderContext orderContext) : base(orderContext)
         {
         }

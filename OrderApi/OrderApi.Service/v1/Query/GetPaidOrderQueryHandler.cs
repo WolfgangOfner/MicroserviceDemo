@@ -18,7 +18,6 @@ namespace OrderApi.Service.v1.Query
 
         public async Task<List<Order>> Handle(GetPaidOrderQuery request, CancellationToken cancellationToken)
         {
-            // todo tests
             return await _orderRepository.GetPaidOrdersAsync(cancellationToken);
         }
     }

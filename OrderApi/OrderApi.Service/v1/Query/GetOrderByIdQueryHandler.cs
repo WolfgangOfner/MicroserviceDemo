@@ -17,7 +17,6 @@ namespace OrderApi.Service.v1.Query
 
         public async Task<Order> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
         {
-            // todo tests
             return await _orderRepository.GetOrderByIdAsync(request.Id, cancellationToken);
         }
     }
