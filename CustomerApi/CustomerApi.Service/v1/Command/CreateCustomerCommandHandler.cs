@@ -17,7 +17,6 @@ namespace CustomerApi.Service.v1.Command
 
         public async Task<Customer> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            // todo tests
             return await _customerRepository.AddAsync(request.Customer);
         }
     }

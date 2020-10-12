@@ -20,7 +20,6 @@ namespace CustomerApi.Service.v1.Command
 
         public async Task<Customer> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
-            // todo tests
             var customer = await _customerRepository.UpdateAsync(request.Customer);
 
             _customerUpdateSender.SendCustomer(customer);

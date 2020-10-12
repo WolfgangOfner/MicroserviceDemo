@@ -15,7 +15,6 @@ namespace CustomerApi.Data.Repository.v1
 
         public async Task<Customer> GetCustomerByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            // todo tests
             return await CustomerContext.Customer.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
     }
