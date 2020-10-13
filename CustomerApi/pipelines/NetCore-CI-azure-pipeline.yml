@@ -1,4 +1,4 @@
-name : NetCore-CI
+name : NetCore-CustomerApi-CI
 trigger:
   branches:
     include:
