@@ -1,0 +1,45 @@
+name : NetCore-OrderApi-CI
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - OrderApi/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/OrderApi*.csproj'
+  displayName: 'Restore Nuget Packages'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/OrderApi*.csproj'
+    arguments: '--no-restore'
+  displayName: 'Build projects'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*Test.csproj'
+    arguments: '--no-restore --no-build'
+  displayName: 'Run Tests'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/OrderApi.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+    modifyOutputPath: false
+  displayName: 'Publish OrderApi'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) 
