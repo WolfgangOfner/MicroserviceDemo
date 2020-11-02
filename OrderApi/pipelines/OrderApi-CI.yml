@@ -1,0 +1,41 @@
+name : OrderApi-CI
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - OrderApi/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ImageName: 'wolfgangofner/orderapi:$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:  
+  - job: Build
+    displayName: Build and push Docker image
+    steps:
+    - task: Docker@1      
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Docker Hub'
+        command: 'Build an image'
+        dockerFile: '**/OrderApi/OrderApi/Dockerfile'
+        imageName: '$(ImageName)'
+        useDefaultContext: false
+        buildContext: 'OrderApi'
+      displayName: 'Build the Docker image'
+
+    - task: Docker@1      
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Docker Hub'
+        command: 'Push an image'
+        imageName: '$(ImageName)'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      displayName: 'Push the Docker image to Dockerhub'
