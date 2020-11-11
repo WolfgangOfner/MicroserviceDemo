@@ -1,22 +1,40 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["CustomerApi/CustomerApi.csproj", "CustomerApi/"]
-COPY ["CustomerApi.Domain/CustomerApi.Domain.csproj", "CustomerApi.Domain/"]
-COPY ["CustomerApi.Messaging.Send/CustomerApi.Messaging.Send.csproj", "CustomerApi.Messaging.Send/"]
-COPY ["CustomerApi.Service/CustomerApi.Service.csproj", "CustomerApi.Service/"]
 COPY ["CustomerApi.Data/CustomerApi.Data.csproj", "CustomerApi.Data/"]
+COPY ["CustomerApi.Domain/CustomerApi.Domain.csproj", "CustomerApi.Domain/"]
+COPY ["CustomerApi.Service/CustomerApi.Service.csproj", "CustomerApi.Service/"]
+COPY ["CustomerApi.Messaging.Send/CustomerApi.Messaging.Send.csproj", "CustomerApi.Messaging.Send/"]
+COPY ["Tests/CustomerApi.Test/CustomerApi.Test.csproj", "Tests/CustomerApi.Test/"]  
+COPY ["Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj", "Tests/CustomerApi.Service.Test/"]  
+COPY ["Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj", "Tests/CustomerApi.Data.Test/"] 
+COPY ["*.props", "./"]
+
 RUN dotnet restore "CustomerApi/CustomerApi.csproj"
+RUN dotnet restore "Tests/CustomerApi.Test/CustomerApi.Test.csproj"
+RUN dotnet restore "Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj"
+RUN dotnet restore "Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj"
 COPY . .
-WORKDIR "/src/CustomerApi"
-RUN dotnet build "CustomerApi.csproj" -c Release -o /app/build
+
+RUN dotnet build "CustomerApi/CustomerApi.csproj" -c Release -o /app/build --no-restore
+RUN dotnet build "Tests/CustomerApi.Test/CustomerApi.Test.csproj" -c Release --no-restore
+RUN dotnet build "Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj" -c Release --no-restore
+RUN dotnet build "Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj" -c Release --no-restore
+
+FROM build AS test  
+ARG BuildId
+LABEL test=${BuildId}
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results.trx"  Tests/CustomerApi.Test/CustomerApi.Test.csproj  
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results2.trx" Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj  
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results3.trx" Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj
 
 FROM build AS publish
-RUN dotnet publish "CustomerApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "CustomerApi/CustomerApi.csproj" --no-restore -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

@@ -26,10 +26,25 @@ stages:
         dockerRegistryEndpoint: 'Docker Hub'
         command: 'Build an image'
         dockerFile: '**/CustomerApi/CustomerApi/Dockerfile'
+        arguments: '--build-arg BuildId=$(Build.BuildId)'
         imageName: '$(ImageName)'
         useDefaultContext: false
         buildContext: 'CustomerApi'
       displayName: 'Build the Docker image'
+
+    - pwsh: |
+       $id=docker images --filter "label=test=$(Build.BuildId)" -q | Select-Object -First 1
+       docker create --name testcontainer $id
+       docker cp testcontainer:/testresults ./testresults
+       docker rm testcontainer
+      displayName: 'Copy test results' 
+    
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(System.DefaultWorkingDirectory)/testresults'
+      displayName: 'Publish test results'
 
     - task: Docker@1      
       inputs:

@@ -23,6 +23,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerApi.Messaging.Send"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerApi.Service", "CustomerApi.Service\CustomerApi.Service.csproj", "{4B5E2A82-57E9-4413-BFD7-059412568FA3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14C43A8B-379A-40B8-BA8A-554973C2B9B2}"
+	ProjectSection(SolutionItems) = preProject
+		common.props = common.props
+		Directory.Build.props = Directory.Build.props
+		file-version.props = file-version.props
+		GitVersion.yml = GitVersion.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{CAA4ADBE-426E-4AE8-A17E-4A5BBBA54B84}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\CustomerApi-CI.yml = pipelines\CustomerApi-CI.yml
+		pipelines\NetCore-CI-azure-pipeline.yml = pipelines\NetCore-CI-azure-pipeline.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +88,7 @@ Global
 		{062D7308-2BDC-442B-8904-3551C5E46244} = {07375459-1664-4EC7-92FA-BD050BC4D62F}
 		{FD41F449-74AB-4D65-84CD-E52E6E6C2D00} = {07375459-1664-4EC7-92FA-BD050BC4D62F}
 		{4B5E2A82-57E9-4413-BFD7-059412568FA3} = {07375459-1664-4EC7-92FA-BD050BC4D62F}
+		{CAA4ADBE-426E-4AE8-A17E-4A5BBBA54B84} = {14C43A8B-379A-40B8-BA8A-554973C2B9B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CF9C02E-7DA3-48A7-8B84-0212F60D6852}
