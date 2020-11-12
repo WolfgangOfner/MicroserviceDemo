@@ -37,7 +37,7 @@ namespace CustomerApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpPost]
-        public async Task<ActionResult<Customer>> Customer([FromBody] CreateCustomerModel createCustomerModel)
+        public async Task<ActionResult<Customer>> Customer(CreateCustomerModel createCustomerModel)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace CustomerApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpPut]
-        public async Task<ActionResult<Customer>> Customer([FromBody] UpdateCustomerModel updateCustomerModel)
+        public async Task<ActionResult<Customer>> Customer(UpdateCustomerModel updateCustomerModel)
         {
             try
             {

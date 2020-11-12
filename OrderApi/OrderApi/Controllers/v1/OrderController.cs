@@ -38,7 +38,7 @@ namespace OrderApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpPost]
-        public async Task<ActionResult<Order>> Order([FromBody] OrderModel orderModel)
+        public async Task<ActionResult<Order>> Order(OrderModel orderModel)
         {
             try
             {
