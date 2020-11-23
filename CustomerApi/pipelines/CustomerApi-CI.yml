@@ -46,6 +46,13 @@ stages:
         searchFolder: '$(System.DefaultWorkingDirectory)/testresults'
       displayName: 'Publish test results'
 
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/testresults/coverage/coverage.cobertura.xml'
+        reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
+      displayName: 'Publish code coverage results'
+
     - task: Docker@1      
       inputs:
         containerregistrytype: 'Container Registry'

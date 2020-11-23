@@ -29,9 +29,9 @@ RUN dotnet build "Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj" -c Release
 FROM build AS test  
 ARG BuildId
 LABEL test=${BuildId} 
-RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results.trx"  Tests/OrderApi.Test/OrderApi.Test.csproj  
-RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results2.trx" Tests/OrderApi.Service.Test/OrderApi.Service.Test.csproj  
-RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results3.trx" Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=json%2cCobertura /p:CoverletOutput=/testresults/coverage/ -p:MergeWith=/testresults/coverage/coverage.json Tests/OrderApi.Test/OrderApi.Test.csproj  
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results2.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=json%2cCobertura /p:CoverletOutput=/testresults/coverage/ -p:MergeWith=/testresults/coverage/coverage.json Tests/OrderApi.Service.Test/OrderApi.Service.Test.csproj  
+RUN dotnet test --no-build -c Release --results-directory /testresults --logger "trx;LogFileName=test_results3.trx" /p:CollectCoverage=true /p:CoverletOutputFormat=json%2cCobertura /p:CoverletOutput=/testresults/coverage/ -p:MergeWith=/testresults/coverage/coverage.json Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj
 
 FROM build AS publish
 RUN dotnet publish "OrderApi/OrderApi.csproj" --no-restore -c Release -o /app/publish
