@@ -101,7 +101,21 @@ namespace OrderApi
             services.AddTransient<IRequestHandler<UpdateOrderCommand>, UpdateOrderCommandHandler>();
             services.AddTransient<ICustomerNameUpdateService, CustomerNameUpdateService>();
 
-            services.AddHostedService<CustomerFullNameUpdateReceiver>();
+            var enableRabbitMqReceiverEnvironmentVariable = Environment.GetEnvironmentVariable("EnableRabbitMqReceiver");
+
+            if (enableRabbitMqReceiverEnvironmentVariable != null && bool.Parse(enableRabbitMqReceiverEnvironmentVariable))
+            {
+                services.AddHostedService<CustomerFullNameUpdateReceiver>();
+            }
+            else
+            {
+                bool.TryParse(Configuration["RabbitMq:Enabled"], out var enableRabbitMqReceiverSetting);
+
+                if (enableRabbitMqReceiverSetting)
+                {
+                    services.AddHostedService<CustomerFullNameUpdateReceiver>();
+                }
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -15,13 +15,13 @@ services:
         ports:
             - 8000:80
             - 8001:443
-        environment:
-            - "ASPNETCORE_URLS=https://+;http://+"
-            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
-            - Kestrel__Certificates__Default__Password=SecretPassword        
+        #environment:
+        #    - "ASPNETCORE_URLS=https://+;http://+"
+        #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+        #    - Kestrel__Certificates__Default__Password=SecretPassword        
         build:
             context: ./CustomerApi
-            dockerfile: CustomerApi/Dockerfile
+            dockerfile: CustomerApi/Dockerfile.Build
         restart: on-failure        
         depends_on:
             - rabbitmq
@@ -32,12 +32,13 @@ services:
             - 9000:80
             - 9001:443
         environment:
-            - "ASPNETCORE_URLS=https://+;http://+"
-            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
-            - Kestrel__Certificates__Default__Password=SecretPassword       
+        #    - "ASPNETCORE_URLS=https://+;http://+"
+        #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+        #    - Kestrel__Certificates__Default__Password=SecretPassword       
+            - EnableRabbitMqReceiver=true
         build:
             context: ./OrderApi      
-            dockerfile: OrderApi/Dockerfile
+            dockerfile: OrderApi/Dockerfile.Build
         restart: on-failure
         depends_on:
             - rabbitmq            

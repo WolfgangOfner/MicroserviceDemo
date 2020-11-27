@@ -92,7 +92,7 @@ namespace CustomerApi
             services.AddTransient<IValidator<CreateCustomerModel>, CreateCustomerModelValidator>();
             services.AddTransient<IValidator<UpdateCustomerModel>, UpdateCustomerModelValidator>();
 
-            services.AddTransient<ICustomerUpdateSender, CustomerUpdateSender>();
+            services.AddSingleton<ICustomerUpdateSender, CustomerUpdateSender>();
 
             services.AddTransient<IRequestHandler<CreateCustomerCommand, Customer>, CreateCustomerCommandHandler>();
             services.AddTransient<IRequestHandler<UpdateCustomerCommand, Customer>, UpdateCustomerCommandHandler>();

@@ -1,0 +1,26 @@
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /src
+COPY ["CustomerApi/CustomerApi.csproj", "CustomerApi/"]
+COPY ["CustomerApi.Data/CustomerApi.Data.csproj", "CustomerApi.Data/"]
+COPY ["CustomerApi.Domain/CustomerApi.Domain.csproj", "CustomerApi.Domain/"]
+COPY ["CustomerApi.Service/CustomerApi.Service.csproj", "CustomerApi.Service/"]
+COPY ["CustomerApi.Messaging.Send/CustomerApi.Messaging.Send.csproj", "CustomerApi.Messaging.Send/"]
+COPY ["*.props", "./"]
+
+RUN dotnet restore "CustomerApi/CustomerApi.csproj"
+COPY . .
+
+RUN dotnet build "CustomerApi/CustomerApi.csproj" -c Release -o /app/build --no-restore
+
+FROM build AS publish
+RUN dotnet publish "CustomerApi/CustomerApi.csproj" --no-restore -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "CustomerApi.dll"]

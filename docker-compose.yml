@@ -15,10 +15,10 @@ services:
         ports:
             - 8000:80
             - 8001:443
-        environment:
-            - "ASPNETCORE_URLS=https://+;http://+"
-            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
-            - Kestrel__Certificates__Default__Password=SecretPassword        
+        #environment:
+        #    - "ASPNETCORE_URLS=https://+;http://+"
+        #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+        #    - Kestrel__Certificates__Default__Password=SecretPassword        
         image: wolfgangofner/customerapi   
         restart: on-failure        
         depends_on:
@@ -29,10 +29,10 @@ services:
         ports:
             - 9000:80
             - 9001:443
-        environment:
-            - "ASPNETCORE_URLS=https://+;http://+"
-            - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
-            - Kestrel__Certificates__Default__Password=SecretPassword       
+        #environment:
+        #    - "ASPNETCORE_URLS=https://+;http://+"
+        #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
+        #    - Kestrel__Certificates__Default__Password=SecretPassword       
         image: wolfgangofner/orderapi       
         restart: on-failure
         depends_on:
