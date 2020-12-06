@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0
+ARG BUILD_CONFIGURATION=Debug
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:80
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+EXPOSE 80
+
+WORKDIR /src
+COPY ["CustomerApi.Data/CustomerApi.Data.csproj", "CustomerApi.Data/"]
+COPY ["CustomerApi.Domain/CustomerApi.Domain.csproj", "CustomerApi.Domain/"]
+COPY ["CustomerApi.Messaging.Send/CustomerApi.Messaging.Send.csproj", "CustomerApi.Messaging.Send/"]
+COPY ["CustomerApi.Service/CustomerApi.Service.csproj", "CustomerApi.Service/"]
+COPY ["CustomerApi/CustomerApi.csproj", "CustomerApi/"]
+
+RUN dotnet restore "CustomerApi/CustomerApi.csproj"
+COPY . .
+WORKDIR "/src/CustomerApi"
+RUN dotnet build --no-restore "CustomerApi.csproj" -c $BUILD_CONFIGURATION
+
+RUN echo "exec dotnet run --no-build --no-launch-profile -c $BUILD_CONFIGURATION --" > /entrypoint.sh
+
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
