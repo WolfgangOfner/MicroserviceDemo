@@ -35,7 +35,6 @@ services:
         #    - "ASPNETCORE_URLS=https://+;http://+"
         #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
         #    - Kestrel__Certificates__Default__Password=SecretPassword       
-            - EnableRabbitMqReceiver=true
         build:
             context: ./OrderApi      
             dockerfile: OrderApi/Dockerfile.Build

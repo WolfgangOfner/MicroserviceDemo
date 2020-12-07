@@ -35,18 +35,23 @@ spec:
           {{- if .Values.probes.enabled }}
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           {{- end }}
           env:
             {{- $root := . }}
+            {{- range $key, $value := .Values.envvariables }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- $root := . }}
             {{- range $ref, $values := .Values.secrets }}
             {{- range $key, $value := $values }}
-            - name: {{ $ref }}_{{ $key }}
+            - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
                   name: {{ template "customerapi.fullname" $root }}-{{ $ref | lower }}

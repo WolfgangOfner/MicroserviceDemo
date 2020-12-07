@@ -4,8 +4,8 @@
 fullnameOverride: orderapi
 replicaCount: 1
 image:
-  repository: orderapi
-  tag: stable
+  repository: wolfgangofner/orderapi
+  tag: latest
   pullPolicy: IfNotPresent
 imagePullSecrets: []
   # Optionally specify an array of imagePullSecrets.
@@ -15,7 +15,7 @@ imagePullSecrets: []
   # This uses credentials from secret "myRegistryKeySecretName".
   # - name: myRegistryKeySecretName
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 80
 
 deployment:

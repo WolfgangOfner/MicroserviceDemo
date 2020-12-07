@@ -39,9 +39,12 @@ namespace OrderApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
             services.AddOptions();
 
-            services.Configure<RabbitMqConfiguration>(Configuration.GetSection("RabbitMq"));
+            var serviceClientSettingsConfig = Configuration.GetSection("RabbitMq");
+            var serviceClientSettings = serviceClientSettingsConfig.Get<RabbitMqConfiguration>();
+            services.Configure<RabbitMqConfiguration>(serviceClientSettingsConfig);
 
             services.AddDbContext<OrderContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
@@ -92,7 +95,7 @@ namespace OrderApi
             services.AddScoped<IOrderRepository, OrderRepository>();
 
             services.AddTransient<IValidator<OrderModel>, OrderModelValidator>();
-            
+
             services.AddTransient<IRequestHandler<GetPaidOrderQuery, List<Order>>, GetPaidOrderQueryHandler>();
             services.AddTransient<IRequestHandler<GetOrderByIdQuery, Order>, GetOrderByIdQueryHandler>();
             services.AddTransient<IRequestHandler<GetOrderByCustomerGuidQuery, List<Order>>, GetOrderByCustomerGuidQueryHandler>();
@@ -100,21 +103,10 @@ namespace OrderApi
             services.AddTransient<IRequestHandler<PayOrderCommand, Order>, PayOrderCommandHandler>();
             services.AddTransient<IRequestHandler<UpdateOrderCommand>, UpdateOrderCommandHandler>();
             services.AddTransient<ICustomerNameUpdateService, CustomerNameUpdateService>();
-
-            var enableRabbitMqReceiverEnvironmentVariable = Environment.GetEnvironmentVariable("EnableRabbitMqReceiver");
-
-            if (enableRabbitMqReceiverEnvironmentVariable != null && bool.Parse(enableRabbitMqReceiverEnvironmentVariable))
+            
+            if (serviceClientSettings.Enabled)
             {
                 services.AddHostedService<CustomerFullNameUpdateReceiver>();
-            }
-            else
-            {
-                bool.TryParse(Configuration["RabbitMq:Enabled"], out var enableRabbitMqReceiverSetting);
-
-                if (enableRabbitMqReceiverSetting)
-                {
-                    services.AddHostedService<CustomerFullNameUpdateReceiver>();
-                }
             }
         }
 
@@ -140,6 +132,7 @@ namespace OrderApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
         }
     }
