@@ -63,3 +63,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+envvariables:
+  rabbitmq__enabled: false
