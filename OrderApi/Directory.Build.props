@@ -2,8 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <ImportGroup Condition=" '$(MSBuildProjectExtension)' == '.csproj' ">
-    <Import Project=".\file-version.props" />
-      <Import Project=".\common.props" />
+    <Import Project=".\common.props" />
   </ImportGroup>
 
 </Project>
