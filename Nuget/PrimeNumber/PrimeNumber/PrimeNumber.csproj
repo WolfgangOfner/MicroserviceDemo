@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>WolfgangOfner.MicroserviceDemo.PrimeNumber</RootNamespace>
+    <AssemblyName>WolfgangOfner.MicroserviceDemo.PrimeNumber</AssemblyName>
+    <Copyright>Wolfgang Ofner</Copyright>
+    <PackageProjectUrl>https://github.com/WolfgangOfner/MicroserviceDemo</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/WolfgangOfner/MicroserviceDemo</RepositoryUrl>
+  </PropertyGroup>
+
+</Project>

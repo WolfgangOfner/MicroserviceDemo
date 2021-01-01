@@ -1,0 +1,151 @@
+name : Nuget-CI-CD
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+    - Nuget/*
+    exclude:
+    - Nuget/**/*.Test
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  BuildConfiguration: Release
+  ArtifactNugetName: 'packages-nuget'
+
+stages:
+- stage: build
+  displayName: 'Build Nuget Package'
+  jobs:
+  - job: CI_Build
+    displayName: 'Nuget - Build, Pack and Test'    
+    steps:
+
+    - task: BuildVersioning@0
+      displayName: 'Build Versioning'
+      inputs:
+        versionSource: 'gitversion'
+        doInstallGitVersion: true
+        GitVersionInstallerSource: 'choco'
+        GitVersionInstallerVersion: '5.0.1'
+        doUseLatestGitVersionInstallerVersion: false
+        paramAssemblyVersion: '7'
+        paramAssemblyFileVersion: '7'
+        paramAssemblyInformationalVersion: '6'
+        paramOverwriteFourthDigitWithBuildCounter: false
+        paramVersionCode: '2'
+        doAssemblyInfoAppendSuffix: false
+        doConvertAssemblyInfoToLowerCase: true
+        buildNumberVersionFormat: '3'
+        buildNumberAction: 'replace'
+        doReplaceAssemblyInfo: false
+        doReplaceNuspec: false
+        doReplaceNpm: false
+        doReplaceDotNetCore: true
+        filePatternDotNetCore: |
+          **\*.csproj
+          **\*.props
+        paramDotNetCoreVersionType: '3'
+        doReplaceAndroid: false
+        doReplaceiOS: false
+        doReplaceCustom: false
+        doShowWarningsForUnmatchedRegex: false
+        excludeFilePattern: |
+          !**/bin/**
+          !**/obj/**
+          !**/node_modules/**
+          !**/packages/**
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore packages'
+      inputs:
+        command: 'restore'
+        projects: 'Nuget/**/*.csproj'
+        feedsToUse: 'select'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build solution'
+      inputs:
+        command: 'build'
+        projects: 'Nuget/**/*.csproj'
+        arguments: '-c $(BuildConfiguration) --no-restore'
+
+    - task: DotNetCoreCLI@2
+      displayName: Run tests
+      inputs:
+        command: 'test'        
+        projects: 'Nuget/**/*.Test.csproj'
+        arguments: '-c $(BuildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        publishTestResults: true
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage report'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Create nuget packages'
+      inputs:
+        command: 'pack'
+        packagesToPack: 'Nuget/**/*.csproj;!**/*.Test.csproj'
+        packDirectory: '$(Build.ArtifactStagingDirectory)/packages/nuget'
+        nobuild: true
+        versioningScheme: 'byBuildNumber'
+
+    - publish: '$(Build.ArtifactStagingDirectory)/packages/nuget'
+      displayName: 'Publish Artifact: $(ArtifactNugetName)'
+      artifact: 'packages-nuget'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+#- stage: publishinternal
+#  dependsOn: build
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#  displayName: 'Nuget - Publish Internal Packages'
+#  jobs:
+#  - deployment: publishinternal
+#    displayName: 'Nuget - Publish packages to internal feed'
+#    environment: nuget-publish-internal
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - download: current
+#            artifact: '$(ArtifactNugetName)'
+#            displayName: 'Download nuget packages'
+#
+#          - task: DotNetCoreCLI@2
+#            displayName: "Publish nuget packages to internal feed"
+#            inputs:
+#              command: 'push'
+#              packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
+#              nuGetFeedType: 'internal'
+#              publishVstsFeed: '53079f18-4f78-46e4-8b08-d624134fc0c5'
+#              arguments: --skip-duplicate
+#
+#- stage: publishpublic
+#  dependsOn: publishinternal
+#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+#  displayName: 'Nuget - Publish Public Packages'
+#  jobs:
+#  - deployment: publishpublic
+#    displayName: 'Nuget - Publish packages to public feed'
+#    environment: nuget-publish-public
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - download: current
+#            artifact: '$(ArtifactNugetName)'
+#            displayName: 'Download nuget packages'
+#
+         # - task: DotNetCoreCLI@2
+         #   displayName: "Publish nuget packages to public feed"
+         #   inputs:
+         #     command: 'push'
+         #     packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
+         #     nuGetFeedType: 'external'
+         #     publishFeedCredentials: 'PrimeNumber' # Add your Nuget Service Connection here

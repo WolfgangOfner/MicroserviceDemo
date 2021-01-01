@@ -64,7 +64,7 @@ namespace OrderApi.Messaging.Receive.Receiver.v1
             consumer.Shutdown += OnConsumerShutdown;
             consumer.Registered += OnConsumerRegistered;
             consumer.Unregistered += OnConsumerUnregistered;
-            consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
+            consumer.ConsumerCancelled += OnConsumerCancelled;
 
             _channel.BasicConsume(_queueName, false, consumer);
 
@@ -76,7 +76,7 @@ namespace OrderApi.Messaging.Receive.Receiver.v1
             _customerNameUpdateService.UpdateCustomerNameInOrders(updateCustomerFullNameModel);
         }
 
-        private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e)
+        private void OnConsumerCancelled(object sender, ConsumerEventArgs e)
         {
         }
 
