@@ -26,6 +26,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Kubernetes.Tools.Targets" Version="1.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="WolfgangOfner.MicroserviceDemo.PrimeNumber" Version="0.1.63" />
   </ItemGroup>
 
   <ItemGroup>

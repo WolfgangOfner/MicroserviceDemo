@@ -101,31 +101,30 @@ stages:
       artifact: 'packages-nuget'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
-#- stage: publishinternal
-#  dependsOn: build
-#  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-#  displayName: 'Nuget - Publish Internal Packages'
-#  jobs:
-#  - deployment: publishinternal
-#    displayName: 'Nuget - Publish packages to internal feed'
-#    environment: nuget-publish-internal
-#    strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#          - download: current
-#            artifact: '$(ArtifactNugetName)'
-#            displayName: 'Download nuget packages'
-#
-#          - task: DotNetCoreCLI@2
-#            displayName: "Publish nuget packages to internal feed"
-#            inputs:
-#              command: 'push'
-#              packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
-#              nuGetFeedType: 'internal'
-#              publishVstsFeed: '53079f18-4f78-46e4-8b08-d624134fc0c5'
-#              arguments: --skip-duplicate
-#
+- stage: publishinternal
+  dependsOn: build
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  displayName: 'Nuget - Publish Internal Packages'
+  jobs:
+  - deployment: publishinternal
+    displayName: 'Nuget - Publish packages to internal feed'
+    environment: nuget-publish-internal
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: '$(ArtifactNugetName)'
+            displayName: 'Download nuget packages'
+
+          - task: DotNetCoreCLI@2
+            displayName: "Publish nuget packages to internal feed"
+            inputs:
+              command: 'push'
+              packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
+              nuGetFeedType: 'internal'
+              publishVstsFeed: '53079f18-4f78-46e4-8b08-d624134fc0c5'
+
 #- stage: publishpublic
 #  dependsOn: publishinternal
 #  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

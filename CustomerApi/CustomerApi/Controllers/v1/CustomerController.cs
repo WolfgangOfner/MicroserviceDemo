@@ -55,7 +55,7 @@ namespace CustomerApi.Controllers.v1
         /// <summary>
         /// Action to update an existing customer
         /// </summary>
-        /// <param name="updateCustomerModel">Model to update an existing customer</param>
+        /// <param name="updateCustomerModel">Model to update an existing customer.</param>
         /// <returns>Returns the updated customer</returns>
         /// <response code="200">Returned if the customer was updated</response>
         /// <response code="400">Returned if the model couldn't be parsed or the customer couldn't be found</response>
