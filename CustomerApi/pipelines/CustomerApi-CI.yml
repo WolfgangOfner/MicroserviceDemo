@@ -62,7 +62,7 @@ stages:
         dockerRegistryEndpoint: 'Docker Hub'
         command: 'Build an image'
         dockerFile: '**/CustomerApi/CustomerApi/Dockerfile'
-        arguments: '--build-arg BuildId=$(Build.BuildId)'
+        arguments: '--build-arg BuildId=$(Build.BuildId) --build-arg PAT=$(PatMicroserviceDemoNugetsFeed)'
         imageName: '$(ImageName)'
         useDefaultContext: false
         buildContext: 'CustomerApi'
