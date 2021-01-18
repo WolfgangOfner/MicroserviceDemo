@@ -14,7 +14,7 @@ pool:
 
 variables:
   BuildConfiguration: Release
-  ArtifactNugetName: 'packages-nuget'
+  ArtifactNugetName: 'packages-nuget'  
 
 stages:
 - stage: build
@@ -143,10 +143,22 @@ stages:
 #            artifact: '$(ArtifactNugetName)'
 #            displayName: 'Download nuget packages'
 #
+#          # Error: DotNetCore currently does not support using an encrypted Api Key.
+#          # For more information see https://github.com/microsoft/azure-pipelines-tasks/issues/7160
+#          #- task: DotNetCoreCLI@2
+#          #  displayName: "Publish nuget packages to public feed"
+#          #  inputs:
+#          #    command: 'push'
+#          #    packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
+#          #    nuGetFeedType: 'external'
+#          #    publishFeedCredentials: 'PrimeNumber'
+#
 #          - task: DotNetCoreCLI@2
-#            displayName: "Publish nuget packages to public feed"
+#            displayName: Push Nuget Package
 #            inputs:
-#              command: 'push'
-#              packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
-#              nuGetFeedType: 'external'
-#              publishFeedCredentials: 'PrimeNumber' add your nuget.org service connection
+#              command: custom
+#              custom: nuget
+#              arguments: >
+#                push $(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg
+#                -s https://api.nuget.org/v3/index.json
+#                -k $(NuGetApiKey) # Add your Nuget.org ApiKey as secret variable
