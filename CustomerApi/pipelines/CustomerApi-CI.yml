@@ -11,7 +11,15 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ImageName: 'wolfgangofner/customerapi:$(Build.BuildNumber)'
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'customerapi'
+  ClusterResourceGroup: MicroserviceDemo  
+  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(Build.BuildNumber).tgz'  
+  ChartPath: 'CustomerApi/CustomerApi/charts/$(ApiName)'
+  HelmVersion: 3.5.0
+  ImageName: 'wolfgangofner/$(ApiName):$(Build.BuildNumber)'
+  K8sNamespace: '$(ApiName)-test'
+  KubernetesCluster: 'microservice-aks'
 
 stages:
 - stage: Build
@@ -97,3 +105,39 @@ stages:
         imageName: '$(ImageName)'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       displayName: 'Push the Docker image to Dockerhub'
+    
+    - task: HelmInstaller@0
+      displayName: 'Install Helm $(HelmVersion)'
+      inputs:
+        helmVersion: $(HelmVersion)
+        checkLatestHelmVersion: false
+        installKubectl: true
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))   
+      
+    - task: HelmDeploy@0
+      displayName: 'helm package'
+      inputs:
+        azureSubscriptionEndpoint: $(AzureSubscription)
+        azureResourceGroup: $(ClusterResourceGroup)
+        kubernetesCluster: $(KubernetesCluster)
+        command: 'package'
+        chartPath: $(ChartPath)
+        chartVersion: $(Build.BuildNumber)
+        save: false
+        namespace: '$(K8sNamespace)'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))   
+    
+    - task: HelmDeploy@0
+      displayName: 'Helm upgrade release'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscription: $(AzureSubscription)
+        azureResourceGroup: '$(ClusterResourceGroup)'
+        kubernetesCluster: '$(KubernetesCluster)'
+        useClusterAdmin: true
+        namespace: '$(K8sNamespace)'
+        command: 'upgrade'
+        chartType: 'FilePath'
+        chartPath: '$(ChartPackage)'
+        releaseName: '$(ApiName)-$(K8sNamespace)'
+        arguments: '--create-namespace'
