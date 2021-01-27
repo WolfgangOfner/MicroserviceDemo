@@ -35,6 +35,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{
 		pipelines\OrderApi-CI.yml = pipelines\OrderApi-CI.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{9B33A416-5BE8-4636-8F8B-16F65A565B49}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\templates\BuildVersioning.yml = pipelines\templates\BuildVersioning.yml
+		pipelines\templates\DockerBuildAndPush.yml = pipelines\templates\DockerBuildAndPush.yml
+		pipelines\templates\HelmDeploy.yml = pipelines\templates\HelmDeploy.yml
+		pipelines\templates\HelmInstall.yml = pipelines\templates\HelmInstall.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +95,7 @@ Global
 		{1985902B-8213-46CA-9679-D9CEA8A54A7A} = {F3B5EC90-841D-4B2D-80FC-4DC712E41EA0}
 		{4530852C-BD00-4392-ADAE-54986B5D2729} = {F3B5EC90-841D-4B2D-80FC-4DC712E41EA0}
 		{1BEA12E7-75B9-4FB2-BBA3-DD390AEEBC9D} = {57143279-4C14-413E-96CC-42A007A3A5BE}
+		{9B33A416-5BE8-4636-8F8B-16F65A565B49} = {1BEA12E7-75B9-4FB2-BBA3-DD390AEEBC9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {790E3A7E-E195-4C10-BD5A-05299CB36CE2}

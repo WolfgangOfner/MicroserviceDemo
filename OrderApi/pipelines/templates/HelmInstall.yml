@@ -1,0 +1,13 @@
+parameters:
+  - name: helmVersion
+    type: string
+    default: 
+
+steps:
+  - task: HelmInstaller@0
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersion: ${{ parameters.helmVersion }}
+      checkLatestHelmVersion: false
+      installKubectl: true
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))  

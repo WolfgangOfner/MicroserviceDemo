@@ -1,0 +1,54 @@
+parameters:
+  - name: apiName
+    type: string
+    default: 
+  - name: azureSubscription
+    type: string
+    default:
+  - name: buildNumber
+    type: string
+    default:
+  - name: clusterResourceGroup
+    type: string
+    default:
+  - name: chartPackage
+    type: string
+    default:
+  - name: chartPath
+    type: string
+    default:
+  - name: k8sNamespace
+    type: string
+    default:
+  - name: kubernetesCluster
+    type: string
+    default:
+
+steps:
+  - task: HelmDeploy@0
+    displayName: 'helm package'
+    inputs:
+      azureSubscriptionEndpoint: ${{ parameters.azureSubscription }}
+      azureResourceGroup: ${{ parameters.clusterResourceGroup }}
+      kubernetesCluster: ${{ parameters.kubernetesCluster }}
+      command: 'package'
+      chartPath: ${{ parameters.chartPath }}
+      chartVersion: ${{ parameters.buildNumber }}
+      save: false
+      namespace: ${{ parameters.k8sNamespace }}
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))   
+  
+  - task: HelmDeploy@0
+    displayName: 'Helm upgrade release'
+    inputs:
+      connectionType: 'Azure Resource Manager'
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: ${{ parameters.clusterResourceGroup }}
+      kubernetesCluster: ${{ parameters.kubernetesCluster }}
+      useClusterAdmin: true
+      namespace: ${{ parameters.k8sNamespace }}
+      command: 'upgrade'
+      chartType: 'FilePath'
+      chartPath: ${{ parameters.chartPackage }}
+      releaseName: ${{ parameters.apiName }}-${{ parameters.k8sNamespace }}
+      arguments: '--create-namespace'

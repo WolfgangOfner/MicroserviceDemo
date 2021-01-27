@@ -35,6 +35,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{
 		pipelines\NetCore-CI-azure-pipeline.yml = pipelines\NetCore-CI-azure-pipeline.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{860D0DFE-72EB-4CC6-8F6E-1F2BA1A25E88}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\templates\BuildVersioning.yml = pipelines\templates\BuildVersioning.yml
+		pipelines\templates\DockerBuildAndPush.yml = pipelines\templates\DockerBuildAndPush.yml
+		pipelines\templates\HelmDeploy.yml = pipelines\templates\HelmDeploy.yml
+		pipelines\templates\HelmInstall.yml = pipelines\templates\HelmInstall.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +95,7 @@ Global
 		{FD41F449-74AB-4D65-84CD-E52E6E6C2D00} = {07375459-1664-4EC7-92FA-BD050BC4D62F}
 		{4B5E2A82-57E9-4413-BFD7-059412568FA3} = {07375459-1664-4EC7-92FA-BD050BC4D62F}
 		{CAA4ADBE-426E-4AE8-A17E-4A5BBBA54B84} = {14C43A8B-379A-40B8-BA8A-554973C2B9B2}
+		{860D0DFE-72EB-4CC6-8F6E-1F2BA1A25E88} = {CAA4ADBE-426E-4AE8-A17E-4A5BBBA54B84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CF9C02E-7DA3-48A7-8B84-0212F60D6852}

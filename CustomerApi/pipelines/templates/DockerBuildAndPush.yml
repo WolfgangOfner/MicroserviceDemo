@@ -1,0 +1,53 @@
+parameters:
+  - name: buildId
+    type: string
+    default: 
+  - name: patMicroserviceDemoNugetsFeed
+    type: string
+    default: 
+  - name: imageName
+    type: string
+    default: 
+
+steps:
+  - task: Docker@1      
+    inputs:
+      containerregistrytype: 'Container Registry'
+      dockerRegistryEndpoint: 'Docker Hub'
+      command: 'Build an image'
+      dockerFile: '**/CustomerApi/CustomerApi/Dockerfile'
+      arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
+      imageName: ${{ parameters.imageName }}
+      useDefaultContext: false
+      buildContext: 'CustomerApi'
+    displayName: 'Build the Docker image'
+  
+  - pwsh: |
+     $id=docker images --filter "label=test=${{ parameters.buildId }}" -q | Select-Object -First 1
+     docker create --name testcontainer $id
+     docker cp testcontainer:/testresults ./testresults
+     docker rm testcontainer
+    displayName: 'Copy test results' 
+  
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'VSTest'
+      testResultsFiles: '**/*.trx'
+      searchFolder: '$(System.DefaultWorkingDirectory)/testresults'
+    displayName: 'Publish test results'
+  
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/testresults/coverage/coverage.cobertura.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
+    displayName: 'Publish code coverage results'
+  
+  - task: Docker@1      
+    inputs:
+      containerregistrytype: 'Container Registry'
+      dockerRegistryEndpoint: 'Docker Hub'
+      command: 'Push an image'
+      imageName: ${{ parameters.imageName }}
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    displayName: 'Push the Docker image to Dockerhub'
