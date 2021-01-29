@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim AS build
 WORKDIR /src
 COPY ["CustomerApi/CustomerApi.csproj", "CustomerApi/"]
 COPY ["CustomerApi.Data/CustomerApi.Data.csproj", "CustomerApi.Data/"]
