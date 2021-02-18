@@ -35,6 +35,12 @@ ingress:
     # - secretName: chart-example-tls
     #   hosts:
     #     - chart-example.local
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  averageCpuUtilization: 50
+
 secrets: {}
   # Optionally specify a set of secret objects whose values
   # will be injected as environment variables by default.
