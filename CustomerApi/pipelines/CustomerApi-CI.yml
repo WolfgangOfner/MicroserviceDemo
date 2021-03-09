@@ -14,12 +14,12 @@ variables:
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection  
   ApiName: 'customerapi'  
   BuildId: $(Build.BuildId)
-  BuildNumber: $(Build.BuildNumber)
+  BuildNumber: $(GitVersion.NuGetVersionV2)
   ClusterResourceGroup: MicroserviceDemo  
-  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(Build.BuildNumber).tgz'  
+  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'  
   ChartPath: 'CustomerApi/CustomerApi/charts/$(ApiName)'
   HelmVersion: 3.5.0
-  ImageName: 'wolfgangofner/$(ApiName):$(Build.BuildNumber)'
+  ImageName: 'wolfgangofner/$(ApiName):$(BuildNumber)'
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
 
