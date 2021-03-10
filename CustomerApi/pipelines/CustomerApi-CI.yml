@@ -11,17 +11,19 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:  
-  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection  
-  ApiName: 'customerapi'  
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'customerapi'
+  ArtifactName: 'CustomerApi'
   BuildId: $(Build.BuildId)
   BuildNumber: $(GitVersion.NuGetVersionV2)
   ClusterResourceGroup: MicroserviceDemo  
-  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'  
-  ChartPath: 'CustomerApi/CustomerApi/charts/$(ApiName)'
+  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'
+  ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
   HelmVersion: 3.5.0
-  ImageName: 'wolfgangofner/$(ApiName):$(BuildNumber)'
+  ImageName: 'wolfgangofner/$(ApiName)'
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
 
 stages:
 - stage: Build
@@ -29,24 +31,25 @@ stages:
   jobs:  
   - job: Build
     displayName: Build and push Docker image
-    steps:
- 
+    steps: 
     - template: templates/BuildVersioning.yml
     - template: templates/DockerBuildAndPush.yml
       parameters:
           buildId: $(BuildId)
-          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)          
-          imageName: $(ImageName)
+          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)
+          imageName: '$(ImageName):$(BuildNumber)'
     - template: templates/HelmInstall.yml
       parameters: 
           helmVersion: $(HelmVersion)
+          releaseValuesFile: $(ReleaseValuesFile)
     - template: templates/HelmDeploy.yml
       parameters:          
           apiName: $(ApiName)
           azureSubscription: $(AzureSubscription)
           buildNumber: $(BuildNumber)
-          clusterResourceGroup: $(ClusterResourceGroup)          
+          clusterResourceGroup: $(ClusterResourceGroup)
           chartPackage: $(ChartPackage)
-          chartPath: $(ChartPath)          
+          chartPath: $(ChartPath)
           k8sNamespace: $(K8sNamespace)
-          kubernetesCluster: $(KubernetesCluster)
+          kubernetesCluster: $(KubernetesCluster)        
+          releaseValuesFile: $(ReleaseValuesFile)

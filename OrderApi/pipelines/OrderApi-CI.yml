@@ -13,15 +13,17 @@ pool:
 variables:
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'orderapi'
+  ArtifactName: 'OrderApi'
   BuildId: $(Build.BuildId)
   BuildNumber: $(GitVersion.NuGetVersionV2)
   ClusterResourceGroup: MicroserviceDemo  
   ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'  
-  ChartPath: 'OrderApi/OrderApi/charts/$(ApiName)'
+  ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
   HelmVersion: 3.5.0
-  ImageName: 'wolfgangofner/$(ApiName):$(BuildNumber)'
+  ImageName: 'wolfgangofner/$(ApiName)'
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
 
 stages:
 - stage: Build
@@ -29,17 +31,17 @@ stages:
   jobs:  
   - job: Build
     displayName: Build and push Docker image
-    steps:
- 
+    steps: 
     - template: templates/BuildVersioning.yml
     - template: templates/DockerBuildAndPush.yml
       parameters:
           buildId: $(BuildId)
           patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)          
-          imageName: $(ImageName)
+          imageName: '$(ImageName):$(BuildNumber)'
     - template: templates/HelmInstall.yml
       parameters: 
           helmVersion: $(HelmVersion)
+          releaseValuesFile: $(ReleaseValuesFile)
     - template: templates/HelmDeploy.yml
       parameters:          
           apiName: $(ApiName)
@@ -50,3 +52,4 @@ stages:
           chartPath: $(ChartPath)          
           k8sNamespace: $(K8sNamespace)
           kubernetesCluster: $(KubernetesCluster)
+          releaseValuesFile: $(ReleaseValuesFile)
