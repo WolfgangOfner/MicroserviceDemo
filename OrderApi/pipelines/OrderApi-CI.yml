@@ -19,11 +19,19 @@ variables:
   ClusterResourceGroup: MicroserviceDemo  
   ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'  
   ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
+  ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  DatabaseName: Order
   HelmVersion: 3.5.0
   ImageName: 'wolfgangofner/$(ApiName)'
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
+  SQLServerName: wolfgangmicroservicedemoserver.database.windows.net # replace with your server url
+
+resources:
+  containers:
+  - container: linuxsqlpackage
+    image: wolfgangofner/linuxsqlpackage:1.0
 
 stages:
 - stage: Build
@@ -53,3 +61,18 @@ stages:
           k8sNamespace: $(K8sNamespace)
           kubernetesCluster: $(KubernetesCluster)
           releaseValuesFile: $(ReleaseValuesFile)
+
+  - deployment: DeployDatabase
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    displayName: 'Deploy Database'   
+    environment: Database 
+    container: linuxsqlpackage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/DatabaseDeploy.yml
+            parameters:          
+                connectionString: $(ConnectionString)
+                dacpacPath: "$(Agent.BuildDirectory)/dacpacs/$(ArtifactName).Database.Build.dacpac"

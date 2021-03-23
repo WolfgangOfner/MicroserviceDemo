@@ -42,12 +42,26 @@ steps:
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/testresults/coverage/coverage.cobertura.xml'
       reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
     displayName: 'Publish code coverage results'
-  
+
+  - pwsh: |
+      $id=docker images --filter "label=dacpac=${{ parameters.buildId }}" -q | Select-Object -First 1
+      docker create --name dacpaccontainer $id
+      docker cp dacpaccontainer:/dacpacs $(Build.ArtifactStagingDirectory)/dacpacs
+      docker rm dacpaccontainer
+    displayName: 'Copy DACPACs'
+
+  - task: PublishBuildArtifacts@1    
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/dacpacs'
+      ArtifactName: 'dacpacs'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    displayName: 'Publish DACPAC'
+
   - task: Docker@1      
     inputs:
       containerregistrytype: 'Container Registry'
       dockerRegistryEndpoint: 'Docker Hub'
       command: 'Push an image'
-      imageName: ${{ parameters.imageName }}
+      imageName: '${{ parameters.imageName }}'
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     displayName: 'Push the Docker image to Dockerhub'

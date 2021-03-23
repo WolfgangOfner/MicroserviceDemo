@@ -10,6 +10,7 @@ COPY ["CustomerApi.Data/CustomerApi.Data.csproj", "CustomerApi.Data/"]
 COPY ["CustomerApi.Domain/CustomerApi.Domain.csproj", "CustomerApi.Domain/"]
 COPY ["CustomerApi.Service/CustomerApi.Service.csproj", "CustomerApi.Service/"]
 COPY ["CustomerApi.Messaging.Send/CustomerApi.Messaging.Send.csproj", "CustomerApi.Messaging.Send/"]
+COPY ["CustomerApi.Database.Build/CustomerApi.Database.Build.csproj", "CustomerApi.Database.Build/"]
 COPY ["Tests/CustomerApi.Test/CustomerApi.Test.csproj", "Tests/CustomerApi.Test/"]  
 COPY ["Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj", "Tests/CustomerApi.Service.Test/"]  
 COPY ["Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj", "Tests/CustomerApi.Data.Test/"] 
@@ -20,6 +21,7 @@ ARG PAT=localhost
 RUN sed -i "s|</configuration>|<packageSourceCredentials><MicroserviceDemoNugets><add key=\"Username\" value=\"PAT\" /><add key=\"ClearTextPassword\" value=\"${PAT}\" /></MicroserviceDemoNugets></packageSourceCredentials></configuration>|" nuget.config
 
 RUN dotnet restore "CustomerApi/CustomerApi.csproj" --configfile "./nuget.config"
+RUN dotnet restore "CustomerApi.Database.Build/CustomerApi.Database.Build.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/CustomerApi.Test/CustomerApi.Test.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj" --configfile "./nuget.config"
@@ -29,6 +31,12 @@ RUN dotnet build "CustomerApi/CustomerApi.csproj" -c Release -o /app/build --no-
 RUN dotnet build "Tests/CustomerApi.Test/CustomerApi.Test.csproj" -c Release --no-restore
 RUN dotnet build "Tests/CustomerApi.Service.Test/CustomerApi.Service.Test.csproj" -c Release --no-restore
 RUN dotnet build "Tests/CustomerApi.Data.Test/CustomerApi.Data.Test.csproj" -c Release --no-restore
+
+FROM build AS dacpac
+ARG BuildId=localhost
+LABEL dacpac=${BuildId}
+WORKDIR /src
+RUN dotnet build "CustomerApi.Database.Build/CustomerApi.Database.Build.csproj" -c Release -o /dacpacs --no-restore
 
 FROM build AS test  
 ARG BuildId=localhost

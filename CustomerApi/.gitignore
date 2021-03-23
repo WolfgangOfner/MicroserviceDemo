@@ -338,3 +338,11 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+/CustomerApi.Database/Scripts/RunPreScriptsGenerated.sql
+/CustomerApi.Database/Scripts/RunPostScriptsGenerated.sql
+/CustomerApi.Database/Scripts/RunReferenceDataScriptsGenerated.sql
+
+/CustomerApi.Database.Build/Scripts/RunReferenceDataScriptsGenerated.sql
+/CustomerApi.Database.Build/Scripts/RunPreScriptsGenerated.sql
+/CustomerApi.Database.Build/Scripts/RunPostScriptsGenerated.sql

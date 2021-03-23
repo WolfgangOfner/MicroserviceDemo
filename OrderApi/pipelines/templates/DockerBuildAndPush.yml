@@ -15,11 +15,11 @@ steps:
       containerregistrytype: 'Container Registry'
       dockerRegistryEndpoint: 'Docker Hub'
       command: 'Build an image'
-      dockerFile: '**/CustomerApi/CustomerApi/Dockerfile'
+      dockerFile: '**/OrderApi/OrderApi/Dockerfile'
       arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
       imageName: ${{ parameters.imageName }}
       useDefaultContext: false
-      buildContext: 'CustomerApi'
+      buildContext: 'OrderApi'
     displayName: 'Build the Docker image'
   
   - pwsh: |
@@ -42,6 +42,20 @@ steps:
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/testresults/coverage/coverage.cobertura.xml'
       reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
     displayName: 'Publish code coverage results'
+
+  - pwsh: |
+      $id=docker images --filter "label=dacpac=${{ parameters.buildId }}" -q | Select-Object -First 1
+      docker create --name dacpaccontainer $id
+      docker cp dacpaccontainer:/dacpacs $(Build.ArtifactStagingDirectory)/dacpacs
+      docker rm dacpaccontainer
+    displayName: 'Copy DACPACs'
+
+  - task: PublishBuildArtifacts@1    
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/dacpacs'
+      ArtifactName: 'dacpacs'
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    displayName: 'Publish DACPAC'
   
   - task: Docker@1      
     inputs:

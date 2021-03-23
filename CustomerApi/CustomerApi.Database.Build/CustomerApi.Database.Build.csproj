@@ -1,0 +1,21 @@
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/1.11.4">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <SqlServerVersion>SqlAzure</SqlServerVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="..\CustomerApi.Database\dbo\**\*.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Scripts\**\*.sql" />
+    <None Include="Scripts\**\*.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PostDeploy Include=".\Scripts\PostScripts\Script.PostDeployment.sql" />
+    <PreDeploy Include=".\Scripts\PreScripts\Script.PreDeployment.sql" />
+  </ItemGroup>
+
+</Project>

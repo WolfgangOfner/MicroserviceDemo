@@ -35,13 +35,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{
 		pipelines\OrderApi-CI.yml = pipelines\OrderApi-CI.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{9B33A416-5BE8-4636-8F8B-16F65A565B49}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{75826414-CBE6-4848-8306-6DA3517C8D61}"
 	ProjectSection(SolutionItems) = preProject
 		pipelines\templates\BuildVersioning.yml = pipelines\templates\BuildVersioning.yml
 		pipelines\templates\DockerBuildAndPush.yml = pipelines\templates\DockerBuildAndPush.yml
 		pipelines\templates\HelmDeploy.yml = pipelines\templates\HelmDeploy.yml
 		pipelines\templates\HelmInstall.yml = pipelines\templates\HelmInstall.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{8AD01843-F038-4CAB-8915-7E1CC1F78DF1}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "OrderApi.Database", "OrderApi.Database\OrderApi.Database.sqlproj", "{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderApi.Database.Build", "OrderApi.Database.Build\OrderApi.Database.Build.csproj", "{7CD01576-0C34-49DA-BFC9-12836F7C45CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +87,16 @@ Global
 		{4530852C-BD00-4392-ADAE-54986B5D2729}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4530852C-BD00-4392-ADAE-54986B5D2729}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4530852C-BD00-4392-ADAE-54986B5D2729}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{7CD01576-0C34-49DA-BFC9-12836F7C45CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CD01576-0C34-49DA-BFC9-12836F7C45CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CD01576-0C34-49DA-BFC9-12836F7C45CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CD01576-0C34-49DA-BFC9-12836F7C45CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,7 +111,9 @@ Global
 		{1985902B-8213-46CA-9679-D9CEA8A54A7A} = {F3B5EC90-841D-4B2D-80FC-4DC712E41EA0}
 		{4530852C-BD00-4392-ADAE-54986B5D2729} = {F3B5EC90-841D-4B2D-80FC-4DC712E41EA0}
 		{1BEA12E7-75B9-4FB2-BBA3-DD390AEEBC9D} = {57143279-4C14-413E-96CC-42A007A3A5BE}
-		{9B33A416-5BE8-4636-8F8B-16F65A565B49} = {1BEA12E7-75B9-4FB2-BBA3-DD390AEEBC9D}
+		{75826414-CBE6-4848-8306-6DA3517C8D61} = {1BEA12E7-75B9-4FB2-BBA3-DD390AEEBC9D}
+		{BBD7130C-C113-4D99-A4F2-4EF90DB3F2CA} = {8AD01843-F038-4CAB-8915-7E1CC1F78DF1}
+		{7CD01576-0C34-49DA-BFC9-12836F7C45CF} = {8AD01843-F038-4CAB-8915-7E1CC1F78DF1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {790E3A7E-E195-4C10-BD5A-05299CB36CE2}

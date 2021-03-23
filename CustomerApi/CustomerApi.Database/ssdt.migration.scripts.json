@@ -1,0 +1,34 @@
+{
+  "PreScripts": {
+    "ScriptBaseDirectory": "Scripts\\PreScripts",
+    "ScriptNamePattern": "^(\\d{14})_(.*).sql",
+    "ScriptRecursiveSearch": true,
+    "GeneratedScriptPath": "Scripts\\RunPreScriptsGenerated.sql",
+    "ExecutionFilterMode": "all",
+
+    "TreatScriptNamePatternMismatchAsError": true,
+    "TreatHashMismatchAsError": true
+  },
+
+  "PostScripts": {
+    "ScriptBaseDirectory": "Scripts\\PostScripts",
+    "ScriptNamePattern": "^(\\d{14})_(.*).sql",
+    "ScriptRecursiveSearch": true,
+    "GeneratedScriptPath": "Scripts\\RunPostScriptsGenerated.sql",
+    "ExecutionFilterMode": "all",
+
+    "TreatScriptNamePatternMismatchAsError": true,
+    "TreatHashMismatchAsError": true
+  },
+
+  "ReferenceDataScripts": {
+    "ScriptBaseDirectory": "Scripts\\ReferenceDataScripts",
+    "ScriptNamePattern": "^(\\d+)_(.*).sql",
+    "ScriptRecursiveSearch": true,
+    "GeneratedScriptPath": "Scripts\\RunReferenceDataScriptsGenerated.sql",
+    "ExecutionFilterMode": "all",
+
+    "TreatScriptNamePatternMismatchAsError": true,
+    "TreatHashMismatchAsError": true
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Target Name="DeleteGeneratedFiles" BeforeTargets="PreBuildEvent">
+    <Message Text="Deleting $(ProjectDir)Scripts\Run*Generated.sql" />
+    <Delete Files="$(ProjectDir)Scripts\Run*Generated.sql" />
+  </Target>
+  <Import Project="$(MSBuildExtensionsPath)\4tecture\build\CustomSSDTMigrationScripts.props" Condition="Exists('$(MSBuildExtensionsPath)\4tecture\build\CustomSSDTMigrationScripts.props')" />
+</Project>
