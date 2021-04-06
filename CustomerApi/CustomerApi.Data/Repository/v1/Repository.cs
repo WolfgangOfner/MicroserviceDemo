@@ -50,7 +50,7 @@ namespace CustomerApi.Data.Repository.v1
         {
             if (entity == null)
             {
-                throw new ArgumentNullException($"{nameof(AddAsync)} entity must not be null");
+                throw new ArgumentNullException($"{nameof(UpdateAsync)} entity must not be null");
             }
 
             try
