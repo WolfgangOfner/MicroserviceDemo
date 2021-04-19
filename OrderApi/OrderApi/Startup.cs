@@ -46,7 +46,19 @@ namespace OrderApi
             var serviceClientSettings = serviceClientSettingsConfig.Get<RabbitMqConfiguration>();
             services.Configure<RabbitMqConfiguration>(serviceClientSettingsConfig);
 
-            services.AddDbContext<OrderContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            bool.TryParse(Configuration["BaseServiceSettings:UseInMemoryDatabase"], out var useInMemory);
+
+            if (!useInMemory)
+            {
+                services.AddDbContext<OrderContext>(options =>
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("OrderDatabase"));
+                });
+            }
+            else
+            {
+                services.AddDbContext<OrderContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            }
 
             services.AddAutoMapper(typeof(Startup));
 

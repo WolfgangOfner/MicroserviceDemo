@@ -43,8 +43,20 @@ namespace CustomerApi
             var serviceClientSettingsConfig = Configuration.GetSection("RabbitMq");
             services.Configure<RabbitMqConfiguration>(serviceClientSettingsConfig);
 
-            services.AddDbContext<CustomerContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            bool.TryParse(Configuration["BaseServiceSettings:UseInMemoryDatabase"], out var useInMemory);
 
+            if (!useInMemory)
+            {
+                services.AddDbContext<CustomerContext>(options =>
+                {
+                    options.UseSqlServer(Configuration.GetConnectionString("CustomerDatabase"));
+                });
+            }
+            else
+            {
+                services.AddDbContext<CustomerContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            }
+            
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
