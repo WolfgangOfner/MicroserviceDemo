@@ -5,3 +5,6 @@ image:
 secrets:
   connectionstrings:
     ConnectionStrings__OrderDatabase: __ConnectionString__
+
+probes:
+  enabled: true

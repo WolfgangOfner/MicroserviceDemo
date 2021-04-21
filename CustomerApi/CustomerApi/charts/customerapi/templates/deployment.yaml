@@ -37,10 +37,12 @@ spec:
             httpGet:
               path: /health
               port: http
+            initialDelaySeconds: 15
           readinessProbe:
             httpGet:
               path: /health
               port: http
+            initialDelaySeconds: 15
           {{- end }}
           env:
             {{- $root := . }}
