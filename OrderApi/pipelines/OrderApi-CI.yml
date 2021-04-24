@@ -22,7 +22,7 @@ variables:
   ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   DatabaseName: Order
   HelmVersion: 3.5.0
-  ImageName: 'wolfgangofner/$(ApiName)'
+  Repository: 'wolfgangofner/$(ApiName)'  # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
@@ -44,8 +44,11 @@ stages:
     - template: templates/DockerBuildAndPush.yml
       parameters:
           buildId: $(BuildId)
-          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)          
-          imageName: '$(ImageName):$(BuildNumber)'
+          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)
+          containerRegistry: 'Docker Hub' # replace with your Service Connection name
+          repository: $(Repository)
+          tag: $(BuildNumber)
+          artifactName: $(ArtifactName)
     - template: templates/HelmInstall.yml
       parameters: 
           helmVersion: $(HelmVersion)

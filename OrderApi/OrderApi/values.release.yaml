@@ -1,5 +1,5 @@
 image:
-  repository: __ImageName__
+  repository: __Repository__
   tag: __BuildNumber__
 
 secrets:
@@ -8,3 +8,6 @@ secrets:
 
 probes:
   enabled: true
+
+imagePullSecrets:
+  - name: acr-secret

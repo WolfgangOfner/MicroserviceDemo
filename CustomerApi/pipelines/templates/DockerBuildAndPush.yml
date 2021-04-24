@@ -5,22 +5,32 @@ parameters:
   - name: patMicroserviceDemoNugetsFeed
     type: string
     default: 
-  - name: imageName
+  - name: containerRegistry
     type: string
     default: 
+  - name: repository
+    type: string
+    default: 
+  - name: tag
+    type: string
+    default: 
+  - name: artifactName
+    type: string
+    default:
 
 steps:
-  - task: Docker@1      
+  - task: Docker@2
+    displayName: 'Build Docker Container'
     inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: 'Docker Hub'
-      command: 'Build an image'
-      dockerFile: '**/CustomerApi/CustomerApi/Dockerfile'
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'build'
+      Dockerfile: '**/${{ parameters.artifactName }}/${{ parameters.artifactName }}/Dockerfile'
+      buildContext: ${{ parameters.artifactName }}
+      tags: |      
+        ${{ parameters.tag }}
+        latest
       arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
-      imageName: ${{ parameters.imageName }}
-      useDefaultContext: false
-      buildContext: 'CustomerApi'
-    displayName: 'Build the Docker image'
   
   - pwsh: |
      $id=docker images --filter "label=test=${{ parameters.buildId }}" -q | Select-Object -First 1
@@ -57,11 +67,13 @@ steps:
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     displayName: 'Publish DACPAC'
 
-  - task: Docker@1      
+  - task: Docker@2
+    displayName: 'Push Docker Container'
     inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: 'Docker Hub'
-      command: 'Push an image'
-      imageName: '${{ parameters.imageName }}'
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'push'
+      tags: |      
+        ${{ parameters.tag }}
+        latest
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    displayName: 'Push the Docker image to Dockerhub'
