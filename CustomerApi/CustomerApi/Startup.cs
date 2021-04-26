@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using AutoMapper;
 using CustomerApi.Data.Database;
 using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
 using CustomerApi.Messaging.Send.Options.v1;
+using CustomerApi.Messaging.Send.Sender;
 using CustomerApi.Messaging.Send.Sender.v1;
 using CustomerApi.Models.v1;
 using CustomerApi.Service.v1.Command;
@@ -33,7 +33,7 @@ namespace CustomerApi
         {
             Configuration = configuration;
         }
-        
+
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -43,6 +43,9 @@ namespace CustomerApi
 
             var serviceClientSettingsConfig = Configuration.GetSection("RabbitMq");
             services.Configure<RabbitMqConfiguration>(serviceClientSettingsConfig);
+
+            serviceClientSettingsConfig = Configuration.GetSection("AzureServiceBus");
+            services.Configure<AzureServiceBusConfiguration>(serviceClientSettingsConfig);
 
             bool.TryParse(Configuration["BaseServiceSettings:UseInMemoryDatabase"], out var useInMemory);
 
@@ -57,7 +60,7 @@ namespace CustomerApi
             {
                 services.AddDbContext<CustomerContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
             }
-            
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
@@ -107,7 +110,16 @@ namespace CustomerApi
             services.AddTransient<IValidator<CreateCustomerModel>, CreateCustomerModelValidator>();
             services.AddTransient<IValidator<UpdateCustomerModel>, UpdateCustomerModelValidator>();
 
-            services.AddSingleton<ICustomerUpdateSender, CustomerUpdateSender>();
+            bool.TryParse(Configuration["BaseServiceSettings:UserabbitMq"], out var useRabbitMq);
+
+            if (useRabbitMq)
+            {
+                services.AddSingleton<ICustomerUpdateSender, CustomerUpdateSender>();
+            }
+            else
+            {
+                services.AddSingleton<ICustomerUpdateSender, CustomerUpdateSenderServiceBus>();
+            }
 
             services.AddTransient<IRequestHandler<CreateCustomerCommand, Customer>, CreateCustomerCommandHandler>();
             services.AddTransient<IRequestHandler<UpdateCustomerCommand, Customer>, UpdateCustomerCommandHandler>();

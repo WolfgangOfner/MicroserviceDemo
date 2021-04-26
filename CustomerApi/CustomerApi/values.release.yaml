@@ -5,6 +5,7 @@ image:
 secrets:
   connectionstrings:
     ConnectionStrings__CustomerDatabase: __ConnectionString__
+    AzureServiceBus__ConnectionString: __AzureServiceBusConnectionString__
 
 probes:
   enabled: true
