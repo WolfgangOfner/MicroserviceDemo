@@ -2,9 +2,9 @@
 
 MERGE INTO [dbo].[Order] AS Target
 USING (VALUES
-('9f35b48d-cb87-4783-bfdb-21e36012930a', 1, 'd3e3137e-ccc9-488c-9e89-50ba354738c2', 'Wolfgang Ofner'),
-('bffcf83a-0224-4a7c-a278-5aae00a02c1e', 1, '4a2f1e35-f527-4136-8b12-138a57e1ba08', 'Darth Vader'),
-('58e5cd7d-856b-4224-bdff-bd8f85bf5a6d', 2, '334feb16-d7bb-4ca9-ab56-f4fadeb88d21', 'Son Goku')
+('8356c427-d6cb-41bf-9b6a-88cd6578e234', 1, '9F35B48D-CB87-4783-BFDB-21E36012930A', 'Wolfgang Ofner'),
+('bffcf83a-0224-4a7c-a278-5aae00a02c1e', 1, '654B7573-9501-436A-AD36-94C5696AC28F', 'Darth Vader'),
+('58e5cd7d-856b-4224-bdff-bd8f85bf5a6d', 2, '971316E1-4966-4426-B1EA-A36C9DDE1066', 'Son Goku')
 ) AS Source (Id, OrderState, CustomerGuid, CustomerFullName)
 ON (Target.Id = Source.Id)
 WHEN MATCHED AND (
