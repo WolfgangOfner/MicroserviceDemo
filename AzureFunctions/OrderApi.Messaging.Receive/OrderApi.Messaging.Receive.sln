@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderApi.Messaging.Receive", "OrderApi.Messaging.Receive\OrderApi.Messaging.Receive.csproj", "{5C82A15C-320B-408A-A466-A3E78210FF66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderApi.Messaging.Receive", "OrderApi.Messaging.Receive\OrderApi.Messaging.Receive.csproj", "{5C82A15C-320B-408A-A466-A3E78210FF66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F18C7857-B035-4464-8C6E-CF3280E6636A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{5AD25725-B7AA-4B89-98DC-94A5F80E550D}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\NetCore-CI-azure-pipeline.yml = pipelines\NetCore-CI-azure-pipeline.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +25,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5AD25725-B7AA-4B89-98DC-94A5F80E550D} = {F18C7857-B035-4464-8C6E-CF3280E6636A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FC20D753-F7F3-440A-8B9E-86B4CEC93933}

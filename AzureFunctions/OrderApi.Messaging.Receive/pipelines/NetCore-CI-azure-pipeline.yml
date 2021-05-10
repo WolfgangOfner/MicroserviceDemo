@@ -1,0 +1,82 @@
+name : NetCore-CI-azure-pipeline.yml
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - AzureFunctions/OrderApi.Messaging.Receive/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  DatabaseName: Order
+  SolutionPath: 'AzureFunctions/OrderApi.Messaging.Receive/*.sln'
+  SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url
+
+stages:
+- stage: Build
+  displayName: Build solution
+  jobs:  
+  - job: Build
+    displayName: Build and publish solution
+    steps:
+    - task: UseDotNet@2      
+      inputs:
+        packageType: 'sdk'
+        version: '3.x'
+      displayName: 'Use .NET Core SDK 3.x'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'restore'
+        projects: '$(SolutionPath)'
+      displayName: 'Restore NuGet packages'
+ 
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: '$(SolutionPath)'
+      displayName: 'Build solution'
+        
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(SolutionPath)'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
+      displayName: 'Publish solution'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - task: AzureFunctionApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appType: 'functionAppLinux'
+        appName: 'microservicedemoOrderApiMessagingReceive' # replace with the name of your Azure Function
+        package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+      displayName: Deploy Azure Function
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - task: AzureAppServiceSettings@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appName: 'microservicedemoOrderApiMessagingReceive'
+        resourceGroupName: 'MicroserviceDemo'
+        appSettings: |
+          [
+            {
+              "name": "QueueConnectionString",
+              "value": "$(QueueConnectionString)",
+              "slotSetting": false
+            },
+            {
+              "name": "DatabaseConnectionString",
+              "value": "$(ConnectionString)", 
+              "slotSetting": false
+            }
+          ]
+      displayName: Update App Settings
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
