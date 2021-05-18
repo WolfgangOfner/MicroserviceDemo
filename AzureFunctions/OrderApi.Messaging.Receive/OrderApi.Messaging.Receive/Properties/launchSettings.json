@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "OrderApi.Messaging.Receive": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 31538,
+      "useSSL": false
+    }
+  }
+}

@@ -1,0 +1,85 @@
+name : OrderApi.Messaging.Receive-Docker-CI-azure-pipeline.yml
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - AzureFunctions/OrderApi.Messaging.Receive/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ArtifactName: 'OrderApi.Messaging.Receive'  
+  ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  ContainerRegistry: 'Docker Hub'
+  DatabaseName: Order  
+  SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url
+  Repository: 'wolfgangofner/orderapimessagingreceive'
+  Tag: $(GitVersion.NuGetVersionV2)
+
+stages:
+- stage: Build_and_Publish
+  displayName: Build and Publish container
+  jobs:
+  - job: 'Build_and_Publish'
+    displayName: Build and publish the container
+    steps:
+    - task: gitversion/setup@0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.5.0'
+        
+    - task: gitversion/execute@0
+      displayName: Determine Version
+
+    - task: Docker@2
+      displayName: 'Build Docker Container'
+      inputs:
+        containerRegistry: $(ContainerRegistry)
+        repository: $(Repository)
+        command: 'build'
+        Dockerfile: '**/$(ArtifactName)/$(ArtifactName)/Dockerfile'
+        buildContext: 'AzureFunctions/$(ArtifactName)'
+        tags: |      
+          $(Tag)
+          latest        
+  
+    - task: Docker@2
+      displayName: 'Push Docker Container'
+      inputs:
+        containerRegistry: $(ContainerRegistry)
+        repository: $(Repository)
+        command: 'push'
+        tags: |      
+          $(Tag)
+          latest
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - task: AzureFunctionAppContainer@1 
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appName: 'microservicedemoOrderApiMessagingReceive'
+        imageName: '$(Repository):$(Tag)'
+
+    - task: AzureAppServiceSettings@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appName: 'microservicedemoOrderApiMessagingReceive'
+        resourceGroupName: 'MicroserviceDemo'
+        appSettings: |
+          [
+            {
+              "name": "QueueConnectionString",
+              "value": "$(QueueConnectionString)",
+              "slotSetting": false
+            },
+            {
+              "name": "DatabaseConnectionString",
+              "value": "$(ConnectionString)", 
+              "slotSetting": false
+            }
+          ]
+      displayName: Update App Settings
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
