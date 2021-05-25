@@ -136,8 +136,9 @@ namespace CustomerApi
             else
             {
                 app.UseHsts();
+                //app.UsePathBase("/customerapi-test");
             }
-
+            
             app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseSwaggerUI(c =>

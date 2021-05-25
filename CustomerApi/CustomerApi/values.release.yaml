@@ -12,3 +12,14 @@ probes:
 
 imagePullSecrets:
   - name: acr-secret
+
+service:
+  type: ClusterIP
+  
+ingress:
+  enabled: false
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"     
+  namespace: __K8sNamespace__
+  path: /customerapi-test/?(.*)

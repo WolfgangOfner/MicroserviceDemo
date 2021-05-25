@@ -29,6 +29,9 @@ ingress:
   annotations: {}
     # kubernetes.io/tls-acme: "true"
   path: /
+  pathtype: Prefix
+  namespace: customerapi
+    
   # hosts:
   #   - chart-example.local
   tls: []

@@ -131,6 +131,7 @@ namespace OrderApi
             else
             {
                 app.UseHsts();
+                //app.UsePathBase("/orderapi-test");
             }
 
             app.UseHttpsRedirection();
