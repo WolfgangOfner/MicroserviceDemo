@@ -9,8 +9,9 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-  rules:      
-  - http:
+  rules: 
+  - host: {{ .Values.ingress.host }}
+    http:
       paths:
       - path: {{ .Values.ingress.path }}
         pathType: {{ .Values.ingress.pathtype }}

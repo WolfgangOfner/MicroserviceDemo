@@ -27,6 +27,8 @@ variables:
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
   SQLServerName: wolfgangmicroservicedemoserver.database.windows.net # replace with your server url
+  URL: order.programmingwithwolfgang.com # replace with your service url
+  IngressEnabled: true
 
 resources:
   containers:

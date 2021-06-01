@@ -17,9 +17,10 @@ imagePullSecrets:
 #  type: ClusterIP
   
 ingress:
-  enabled: false
+  enabled: __IngressEnabled__
   annotations: 
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"     
   namespace: __K8sNamespace__
-  path: /customerapi-test/?(.*)
+  path: /
+  host: __URL__
