@@ -22,13 +22,14 @@ variables:
   ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   DatabaseName: Order
   HelmVersion: 3.5.0
-  Repository: 'wolfgangofner/$(ApiName)'  # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository
+  Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository
   K8sNamespace: '$(ApiName)-test'
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
   SQLServerName: wolfgangmicroservicedemoserver.database.windows.net # replace with your server url
   URL: order.programmingwithwolfgang.com # replace with your service url
   IngressEnabled: true
+  TlsSecretName: orderapi-tls
 
 resources:
   containers:

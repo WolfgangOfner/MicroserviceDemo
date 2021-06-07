@@ -29,16 +29,15 @@ ingress:
   annotations: {}
     # kubernetes.io/tls-acme: "true"
   path: /
-  pathtype: Prefix
+  pathType: Prefix
   namespace: customerapi
-  host: VALUE_TO_OVERRIDE
+  hosts:
+    - VALUE_TO_OVERRIDE
+  tls:
+    - secretName: VALUE_TO_OVERRIDE
+      hosts:
+        - VALUE_TO_OVERRIDE
     
-  # hosts:
-  #   - chart-example.local
-  tls: []
-    # - secretName: chart-example-tls
-    #   hosts:
-    #     - chart-example.local
 hpa:
   enabled: true
   minReplicas: 1

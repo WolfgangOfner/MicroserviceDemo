@@ -29,6 +29,7 @@ variables:
   SQLServerName: wolfgangmicroservicedemoserver.database.windows.net # replace with your server url
   URL: customer.programmingwithwolfgang.com # replace with your service url
   IngressEnabled: true
+  TlsSecretName: customerapi-tls
 
 resources:
   containers:
