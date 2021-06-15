@@ -13,9 +13,6 @@ parameters:
     default:
 
 steps:
-  - download: current
-    artifact: 'dacpacs'
-    displayName: 'Download DACPAC'
   - pwsh: |
       /opt/sqlpackage/sqlpackage /a:Publish /p:BlockOnPossibleDataLoss=${{ parameters.blockOnPossibleDataLoss }} /p:GenerateSmartDefaults=${{ parameters.generateSmartDefaults }} /tcs:"${{ parameters.connectionString }}" /sf:"${{ parameters.dacpacPath }}"    
     displayName: 'Deploy DACPAC'

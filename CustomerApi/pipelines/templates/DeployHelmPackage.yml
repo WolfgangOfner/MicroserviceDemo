@@ -5,16 +5,13 @@ parameters:
   - name: azureSubscription
     type: string
     default:
-  - name: buildNumber
-    type: string
-    default:
   - name: clusterResourceGroup
     type: string
     default:
   - name: chartPackage
     type: string
     default:
-  - name: chartPath
+  - name: helmVersion
     type: string
     default:
   - name: k8sNamespace
@@ -28,18 +25,17 @@ parameters:
     default: 
 
 steps:
-  - task: HelmDeploy@0
-    displayName: 'helm package'
+  - task: Tokenizer@0
+    displayName: 'Run Tokenizer'
     inputs:
-      azureSubscriptionEndpoint: ${{ parameters.azureSubscription }}
-      azureResourceGroup: ${{ parameters.clusterResourceGroup }}
-      kubernetesCluster: ${{ parameters.kubernetesCluster }}
-      command: 'package'
-      chartPath: ${{ parameters.chartPath }}
-      chartVersion: ${{ parameters.buildNumber }}
-      save: false
-      namespace: ${{ parameters.k8sNamespace }}
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))   
+      sourceFilesPattern: ${{ parameters.releaseValuesFile }}
+
+  - task: HelmInstaller@0
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersion: '${{ parameters.helmVersion }}'
+      checkLatestHelmVersion: false
+      installKubectl: true
   
   - task: HelmDeploy@0
     displayName: 'Helm upgrade release'

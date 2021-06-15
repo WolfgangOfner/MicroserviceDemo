@@ -1,0 +1,67 @@
+parameters:
+  - name: artifactName
+    type: string
+    default: 
+  - name: artifactStagingDirectory
+    type: string
+    default: 
+  - name: azureSubscription
+    type: string
+    default:
+  - name: buildNumber
+    type: string
+    default:
+  - name: clusterResourceGroup
+    type: string
+    default:
+  - name: chartPath
+    type: string
+    default:
+  - name: helmVersion
+    type: string
+    default: 
+  - name: kubernetesCluster
+    type: string
+    default:
+  - name: releaseValuesFile
+    type: string
+    default: 
+  - name: sourceFolder
+    type: string
+    default:
+
+steps:
+  - task: Tokenizer@0
+    displayName: 'Run Tokenizer'
+    inputs:
+      sourceFilesPattern: ${{ parameters.releaseValuesFile }}
+
+  - task: CopyFiles@2
+    displayName: 'Copy Files to:${{ parameters.artifactStagingDirectory }}/${{ parameters.artifactName }}'
+    inputs:
+      SourceFolder: ${{ parameters.sourceFolder }}
+      Contents: values.release.yaml
+      TargetFolder: '${{ parameters.artifactStagingDirectory }}/${{ parameters.artifactName }}'
+
+  - task: HelmInstaller@0
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersion: '${{ parameters.helmVersion }}'
+      checkLatestHelmVersion: false
+      installKubectl: true
+
+  - task: HelmDeploy@0
+    displayName: 'helm package'
+    inputs:
+      azureSubscriptionEndpoint: ${{ parameters.azureSubscription }}
+      azureResourceGroup: ${{ parameters.clusterResourceGroup }}
+      kubernetesCluster: ${{ parameters.kubernetesCluster }}
+      command: 'package'
+      chartPath: ${{ parameters.chartPath }}
+      chartVersion: ${{ parameters.buildNumber }}
+      destination: '${{ parameters.artifactStagingDirectory }}/${{ parameters.artifactName }}'
+      save: false      
+
+  - publish: '${{ parameters.artifactStagingDirectory }}/${{ parameters.artifactName }}'
+    artifact: '${{ parameters.artifactName }}'
+    displayName: 'Publish Artifact: ${{ parameters.artifactName }}'

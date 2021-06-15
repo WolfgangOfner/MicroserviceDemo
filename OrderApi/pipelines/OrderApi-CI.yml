@@ -10,75 +10,44 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
+variables:  
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'orderapi'
   ArtifactName: 'OrderApi'
+  ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
   BuildId: $(Build.BuildId)
   BuildNumber: $(GitVersion.NuGetVersionV2)
-  ClusterResourceGroup: MicroserviceDemo  
-  ChartPackage: '$(Build.ArtifactStagingDirectory)/$(ApiName)-$(BuildNumber).tgz'  
+  ClusterResourceGroup: MicroserviceDemo    
   ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
-  ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-  DatabaseName: Order
-  HelmVersion: 3.5.0
-  Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository
-  K8sNamespace: '$(ApiName)-test'
+  HelmVersion: 3.5.0  
+  Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository  
   KubernetesCluster: 'microservice-aks'
-  ReleaseValuesFile: '$(ArtifactName)/$(ArtifactName)/values.release.yaml'
-  SQLServerName: wolfgangmicroservicedemoserver.database.windows.net # replace with your server url
-  URL: order.programmingwithwolfgang.com # replace with your service url
-  IngressEnabled: true
-  TlsSecretName: orderapi-tls
-
-resources:
-  containers:
-  - container: linuxsqlpackage
-    image: wolfgangofner/linuxsqlpackage:1.0
+  ReleaseValuesFile: '$(ArtifactSourceFolder)/values.release.yaml'    
 
 stages:
-- stage: Build
-  displayName: Build image
+- stage: Build  
   jobs:  
   - job: Build
-    displayName: Build and push Docker image
+    displayName: Build and push Docker image and create Helm package
     steps: 
     - template: templates/BuildVersioning.yml
     - template: templates/DockerBuildAndPush.yml
       parameters:
           buildId: $(BuildId)
           patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)
-          containerRegistry: 'Docker Hub' # replace with your Service Connection name
-          repository: $(Repository)
+          containerRegistry: 'Docker Hub' # MicroserviceDemoRegistry # replace with your Service Connection name
+          repository: $(Repository) 
           tag: $(BuildNumber)
           artifactName: $(ArtifactName)
-    - template: templates/HelmInstall.yml
-      parameters: 
-          helmVersion: $(HelmVersion)
-          releaseValuesFile: $(ReleaseValuesFile)
-    - template: templates/HelmDeploy.yml
+    - template: templates/CreateHelmPackage.yml
       parameters:          
-          apiName: $(ApiName)
           azureSubscription: $(AzureSubscription)
           buildNumber: $(BuildNumber)
           clusterResourceGroup: $(ClusterResourceGroup)          
-          chartPackage: $(ChartPackage)
           chartPath: $(ChartPath)          
-          k8sNamespace: $(K8sNamespace)
-          kubernetesCluster: $(KubernetesCluster)
+          kubernetesCluster: $(KubernetesCluster)        
           releaseValuesFile: $(ReleaseValuesFile)
-
-  - deployment: DeployDatabase
-    dependsOn: Build
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    displayName: 'Deploy Database'   
-    environment: Database 
-    container: linuxsqlpackage
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: templates/DatabaseDeploy.yml
-            parameters:          
-                connectionString: $(ConnectionString)
-                dacpacPath: "$(Agent.BuildDirectory)/dacpacs/$(ArtifactName).Database.Build.dacpac"
+          artifactStagingDirectory: $(Build.ArtifactStagingDirectory)
+          artifactName: $(ArtifactName)
+          helmVersion: $(HelmVersion)
+          sourceFolder: $(ArtifactSourceFolder)

@@ -1,0 +1,121 @@
+name : CustomerApi-CD
+trigger: none
+resources:
+  containers:
+  - container: linuxsqlpackage
+    image: wolfgangofner/linuxsqlpackage:1.0
+  pipelines:
+   - pipeline: CustomerApiBuild
+     source: CustomerApi-CI
+     trigger:
+      branches:
+       include:
+         - master         
+         - pull/*
+         - refs/pull/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:  
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'customerapi'
+  ArtifactName: 'CustomerApi'      
+  ClusterResourceGroup: MicroserviceDemo  
+  ChartPackage: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/customerapi-$(RESOURCES.PIPELINE.CustomerApiBuild.RUNNAME).tgz'  
+  DatabaseName: Customer
+  HelmVersion: 3.5.0    
+  KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/values.release.yaml'
+  SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
+  IngressEnabled: true
+  TlsSecretName: customerapi-tls  
+
+stages:
+- stage: Test  
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  variables:
+    DeploymentEnvironment: 'test'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    URL: $(DeploymentEnvironment).customer.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Test
+    displayName: 'Deploy CustomerApi to the customerapi-test environment'
+    environment: customerapi-test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: CustomerApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+  - deployment: Database_Test
+    dependsOn: Web_Test    
+    displayName: 'Deploy the test database'   
+    environment: database-test
+    container: linuxsqlpackage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: CustomerApiBuild
+            artifact: dacpacs
+          - template: templates/DatabaseDeploy.yml
+            parameters:          
+                connectionString: $(ConnectionString)
+                dacpacPath: "$(Pipeline.Workspace)/CustomerApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"
+
+- stage: Prod
+  dependsOn: Test  
+  variables:
+    DeploymentEnvironment: 'prod'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    URL: customer.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Prod
+    displayName: 'Deploy CustomerApi to the customerapi-prod environment'
+    environment: customerapi-prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: CustomerApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+  - deployment: Database_Prod
+    dependsOn: Web_Prod    
+    displayName: 'Deploy the prod database'   
+    environment: database-prod
+    container: linuxsqlpackage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: CustomerApiBuild
+            artifact: dacpacs
+          - template: templates/DatabaseDeploy.yml
+            parameters:          
+                connectionString: $(ConnectionString)
+                dacpacPath: "$(Pipeline.Workspace)/CustomerApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"

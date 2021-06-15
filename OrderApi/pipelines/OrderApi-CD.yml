@@ -1,0 +1,121 @@
+name : OrderApi-CD
+trigger: none
+resources:
+  containers:
+  - container: linuxsqlpackage
+    image: wolfgangofner/linuxsqlpackage:1.0
+  pipelines:
+   - pipeline: OrderApiBuild
+     source: OrderApi-CI
+     trigger:
+      branches:
+       include:
+         - master         
+         - pull/*
+         - refs/pull/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:  
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'orderapi'
+  ArtifactName: 'OrderApi'      
+  ClusterResourceGroup: MicroserviceDemo  
+  ChartPackage: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/orderapi-$(RESOURCES.PIPELINE.OrderApiBuild.RUNNAME).tgz'  
+  DatabaseName: Order
+  HelmVersion: 3.5.0    
+  KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/values.release.yaml'
+  SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
+  IngressEnabled: true
+  TlsSecretName: orderapi-tls  
+
+stages:
+- stage: Test  
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  variables:
+    DeploymentEnvironment: 'test'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    URL: $(DeploymentEnvironment).order.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Test
+    displayName: 'Deploy OrderApi to the orderapi-test environment'
+    environment: orderapi-test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: OrderApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+  - deployment: Database_Test
+    dependsOn: Web_Test    
+    displayName: 'Deploy the test database'   
+    environment: database-test
+    container: linuxsqlpackage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: OrderApiBuild
+            artifact: dacpacs
+          - template: templates/DatabaseDeploy.yml
+            parameters:          
+                connectionString: $(ConnectionString)
+                dacpacPath: "$(Pipeline.Workspace)/OrderApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"
+
+- stage: Prod
+  dependsOn: Test  
+  variables:
+    DeploymentEnvironment: 'prod'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    URL: order.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Prod
+    displayName: 'Deploy OrderApi to the orderapi-prod environment'
+    environment: orderapi-prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: OrderApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+  - deployment: Database_Prod
+    dependsOn: Web_Prod    
+    displayName: 'Deploy the prod database'   
+    environment: database-prod
+    container: linuxsqlpackage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: OrderApiBuild
+            artifact: dacpacs
+          - template: templates/DatabaseDeploy.yml
+            parameters:          
+                connectionString: $(ConnectionString)
+                dacpacPath: "$(Pipeline.Workspace)/OrderApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"

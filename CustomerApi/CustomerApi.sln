@@ -31,6 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{CAA4ADBE-426E-4AE8-A17E-4A5BBBA54B84}"
 	ProjectSection(SolutionItems) = preProject
+		pipelines\CustomerApi-CD.yml = pipelines\CustomerApi-CD.yml
 		pipelines\CustomerApi-CI.yml = pipelines\CustomerApi-CI.yml
 		pipelines\NetCore-CI-azure-pipeline.yml = pipelines\NetCore-CI-azure-pipeline.yml
 	EndProjectSection
@@ -38,10 +39,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{EF2146F8-4C6D-43C6-953E-A8783E86F755}"
 	ProjectSection(SolutionItems) = preProject
 		pipelines\templates\BuildVersioning.yml = pipelines\templates\BuildVersioning.yml
+		pipelines\templates\CreateHelmPackage.yml = pipelines\templates\CreateHelmPackage.yml
 		pipelines\templates\DatabaseDeploy.yml = pipelines\templates\DatabaseDeploy.yml
+		pipelines\templates\DeployHelmPackage.yml = pipelines\templates\DeployHelmPackage.yml
 		pipelines\templates\DockerBuildAndPush.yml = pipelines\templates\DockerBuildAndPush.yml
-		pipelines\templates\HelmDeploy.yml = pipelines\templates\HelmDeploy.yml
-		pipelines\templates\HelmInstall.yml = pipelines\templates\HelmInstall.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{17DD83A0-1859-443D-B7E9-F70DE138AB0E}"
