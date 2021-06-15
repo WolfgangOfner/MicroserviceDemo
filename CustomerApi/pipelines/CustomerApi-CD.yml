@@ -77,7 +77,8 @@ stages:
                 dacpacPath: "$(Pipeline.Workspace)/CustomerApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"
 
 - stage: Prod
-  dependsOn: Test  
+  dependsOn: Test
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
   variables:
     DeploymentEnvironment: 'prod'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
