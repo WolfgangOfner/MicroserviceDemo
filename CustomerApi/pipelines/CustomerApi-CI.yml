@@ -16,7 +16,7 @@ variables:
   ArtifactName: 'CustomerApi'
   ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
   BuildId: $(Build.BuildId)
-  BuildNumber: $(GitVersion.NuGetVersionV2)
+  BuildNumber: $(GitVersion.FullSemVer)
   ClusterResourceGroup: MicroserviceDemo    
   ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
   HelmVersion: 3.5.0  
@@ -29,7 +29,7 @@ stages:
   jobs:  
   - job: Build
     displayName: Build and push Docker image and create Helm package
-    steps: 
+    steps:
     - template: templates/BuildVersioning.yml
     - template: templates/DockerBuildAndPush.yml
       parameters:

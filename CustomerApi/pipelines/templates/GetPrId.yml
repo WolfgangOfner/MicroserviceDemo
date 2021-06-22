@@ -1,0 +1,5 @@
+steps:
+- pwsh: |
+    $prId = [regex]::match('$(resources.pipeline.CustomerApiBuild.sourcebranch)','(refs/pull/)(\d*)(/merge)').Groups[2].Value
+    Write-Host "##vso[task.setvariable variable=prId;]$prId"    
+  displayName: 'Get PR Id'

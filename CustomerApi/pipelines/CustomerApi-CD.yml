@@ -20,20 +20,75 @@ pool:
 variables:  
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'customerapi'
-  ArtifactName: 'CustomerApi'      
-  ClusterResourceGroup: MicroserviceDemo  
-  ChartPackage: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/customerapi-$(RESOURCES.PIPELINE.CustomerApiBuild.RUNNAME).tgz'  
+  ArtifactName: 'CustomerApi'
+  ClusterResourceGroup: MicroserviceDemo
+  ChartPackage: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/customerapi-$(resources.pipeline.CustomerApiBuild.runname).tgz' 
   DatabaseName: Customer
   HelmVersion: 3.5.0    
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/values.release.yaml'
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
-  TlsSecretName: customerapi-tls  
-
+  TlsSecretName: customerapi-tls
+  
 stages:
-- stage: Test  
-  condition: ne(variables['Build.Reason'], 'PullRequest')
+- stage: PR_Deploy
+  condition: startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/pull/') 
+  variables:      
+    DeploymentEnvironment: 'pr-$(prId)'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    URL: $(DeploymentEnvironment).customer.programmingwithwolfgang.com # replace with your service url     
+  jobs:
+  - deployment: Web_PR
+    environment: "customerapi-PR-Deploy" 
+    displayName: 'Deploy CustomerApi to the PR environment'    
+    strategy:
+      runOnce:
+        deploy:
+          steps:           
+          - download: CustomerApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/GetPrId.yml
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+- stage: PR_Delete
+  dependsOn: PR_Deploy  
+  condition: succeeded('PR_Deploy')
+  variables:
+    K8sNamespace: '$(ApiName)-pr-$(prId)'
+  jobs:  
+  - deployment: Delete_PR_Namespace
+    environment: "customerapi-PR-Delete" 
+    displayName: Build and push Docker image and create Helm package
+    strategy:
+      runOnce:
+        deploy:
+         steps:
+         - download: none
+         - template: templates/GetPrId.yml
+         - task: Kubernetes@1       
+           inputs:
+             connectionType: 'Azure Resource Manager'
+             azureSubscriptionEndpoint: 'AzureServiceConnection'
+             azureResourceGroup: $(ClusterResourceGroup)
+             kubernetesCluster: $(KubernetesCluster)
+             useClusterAdmin: true
+             command: 'delete'
+             arguments: 'namespaces $(k8sNamespace)'
+           displayName: 'Delete PR namespace'
+
+- stage: Test     
+  condition: startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master')
   variables:
     DeploymentEnvironment: 'test'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
@@ -62,6 +117,7 @@ stages:
  
   - deployment: Database_Test
     dependsOn: Web_Test    
+    condition: and(succeeded(), startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master'))
     displayName: 'Deploy the test database'   
     environment: database-test
     container: linuxsqlpackage
@@ -78,7 +134,7 @@ stages:
 
 - stage: Prod
   dependsOn: Test
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and(succeeded(), startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master'))
   variables:
     DeploymentEnvironment: 'prod'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'

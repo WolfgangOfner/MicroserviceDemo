@@ -63,8 +63,7 @@ steps:
   - task: PublishBuildArtifacts@1    
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/dacpacs'
-      ArtifactName: 'dacpacs'
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      ArtifactName: 'dacpacs'    
     displayName: 'Publish DACPAC'
 
   - task: Docker@2
@@ -74,6 +73,14 @@ steps:
       repository: ${{ parameters.repository }}
       command: 'push'
       tags: |      
-        ${{ parameters.tag }}
+        ${{ parameters.tag }}            
+
+  - task: Docker@2
+    displayName: 'Push Docker Container'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'push'
+      tags: |              
         latest
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

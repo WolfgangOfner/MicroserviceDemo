@@ -16,7 +16,7 @@ variables:
   ArtifactName: 'OrderApi'
   ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
   BuildId: $(Build.BuildId)
-  BuildNumber: $(GitVersion.NuGetVersionV2)
+  BuildNumber: $(GitVersion.FullSemVer)
   ClusterResourceGroup: MicroserviceDemo    
   ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
   HelmVersion: 3.5.0  
