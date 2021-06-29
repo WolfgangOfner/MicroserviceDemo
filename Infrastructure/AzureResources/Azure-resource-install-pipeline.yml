@@ -1,0 +1,287 @@
+trigger: none
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:  
+  AksClusterName: microservice-aks
+  AzureSubscription: AzureServiceConnection # replace with your subscription connection name
+  AzureConnectionType: Azure Resource Manager 
+  CertIssuerEmail: <your email>  # replace with your email
+  CertManagerNamespace: cert-manager  
+  FunctionName: OrderApiMessagingReceive # replace with unique name
+  FunctionOs: Linux
+  FunctionPlanName: MicroservicedemoFunctionPlan
+  FunctionSku: B1  
+  FunctionVersion: 3    
+  HelmVersion: '3.5.0'
+  Kubernetesversion: '1.19.9'
+  KubectlVersion: '1.19.9'
+  NetworkPlugin: kubenet
+  NodeCount: 1  
+  NginxNamespace: ingress-basic
+  ResourceGroupLocation: westeurope
+  ResourceGroupName: MicroserviceDemo  
+  ServiceBusNamespaceName: microservicedemo # replace with unique name
+  ServiceBusNamespaceSku: Basic
+  ServiceBusQueueName: CustomerQueue
+  ServiceBusQueueSasListenName: ReceiveKey
+  ServiceBusQueueSasSendName: SendKey  
+  SqlServerName: wolfgangmicroservicedemosql # replace with unique name
+  StorageAccountName: orderreceivestorage # replace with unique name
+
+steps:
+  - task: HelmInstaller@0
+    displayName: Install Helm
+    inputs:
+      helmVersion: '$(HelmVersion)'
+      checkLatestHelmVersion: false
+      installKubectl: true
+      kubectlVersion: '$(KubectlVersion)'
+      checkLatestKubectl: false
+
+  - task: AzureCLI@2
+    displayName: "Create resource group"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |                
+        az group create -g "$(ResourceGroupName)" -l "$(ResourceGroupLocation)"
+
+  # Create AKS
+  - task: AzureCLI@2
+    displayName: "Create AKS cluster"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |        
+        az aks create `
+            --resource-group "$(ResourceGroupName)" `
+            --location "$(ResourceGroupLocation)"  `
+            --name "$(AksClusterName)" `
+            --network-plugin $(NetworkPlugin) `
+            --kubernetes-version $(KubernetesVersion) `
+            --node-vm-size Standard_B2s `
+            --node-osdisk-size 0 `
+            --node-count $(NodeCount)`
+            --load-balancer-sku standard `
+            --max-pods 110 `
+            --dns-name-prefix microservice-aks-dns `
+            --generate-ssh-keys
+
+  # Install Cert Manager
+  - task: HelmDeploy@0
+    displayName: "Install cert manager"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'add jetstack https://charts.jetstack.io'
+
+  - task: HelmDeploy@0
+    displayName: "Install cert manager"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'update'
+
+  - task: HelmDeploy@0
+    displayName: "Install cert manager"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      namespace: '$(CertManagerNamespace)'
+      command: 'upgrade'
+      chartType: 'Name'
+      chartName: 'jetstack/cert-manager'      
+      releaseName: 'cert-manager'
+      overrideValues: 'installCRDs=true,inodeSelector.kubernetes\.io/os=linux,webhook.nodeSelector.kubernetes\.io/os"=linux,cainjector.nodeSelector."kubernetes\.io/os"=linux'
+      arguments: '--create-namespace'
+
+  # Install Cluster Issuer     
+  - task: Kubernetes@1       
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscriptionEndpoint: 'AzureServiceConnection'
+      azureResourceGroup: $(ResourceGroupName)
+      kubernetesCluster: $(AksClusterName)
+      useClusterAdmin: true
+      command: 'apply'
+      arguments: '-f https://raw.githubusercontent.com/WolfgangOfner/MicroserviceDemo/master/Infrastructure/AzureResources/scripts/cluster-issuer.yaml'
+    displayName: 'Install Cluster Issuer'
+
+  # Install Nginx Ingress Controller
+  - task: HelmDeploy@0
+    displayName: "Install ingress-nginx (Helm repo add)"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'add ingress-nginx https://kubernetes.github.io/ingress-nginx'
+  
+  - task: HelmDeploy@0
+    displayName: "Install ingress-nginx (Helm repo update)"    
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'update'
+
+  - task: HelmDeploy@0
+    displayName: "Install ingress-nginx"    
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'upgrade'
+      chartType: 'Name'
+      chartName: 'ingress-nginx/ingress-nginx'      
+      releaseName: 'ingress-nginx'
+      overrideValues: 'controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux'
+      namespace: $(NginxNamespace)
+      arguments: '--create-namespace'
+
+  # Create Azure SQL Server
+  - task: AzureCLI@2
+    displayName: "Create SQL Server"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az sql server create `
+        --location $(ResourceGroupLocation) `
+        --resource-group $(ResourceGroupName) `
+        --name $(SqlServerName) `
+        --admin-user $(SqlServerAdminUser) `
+        --admin-password "$(SqlServerAdminPassword)"
+
+  - task: AzureCLI@2
+    displayName: "Create SQL Server Firewall rule"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |     
+        az sql server firewall-rule create `
+        --resource-group $(ResourceGroupName) `
+        --server $(SqlServerName) `
+        --name AllowAzureServices `
+        --start-ip-address 0.0.0.0 `
+        --end-ip-address 0.0.0.0
+  
+  # Create Azure Service Bus 
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Namespace"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus namespace create `
+        --name $(ServiceBusNamespaceName) `
+        --sku $(ServiceBusNamespaceSku) `
+        --resource-group $(ResourceGroupName) `
+        --location $(ResourceGroupLocation)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue create `
+        --name $(ServiceBusQueueName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --resource-group $(ResourceGroupName)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue Send SAS"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue authorization-rule create `
+        --name $(ServiceBusQueueSasSendName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --queue-name $(ServiceBusQueueName) `
+        --resource-group $(ResourceGroupName) `
+        --rights Send
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue Listen SAS"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue authorization-rule create `
+        --name $(ServiceBusQueueSasListenName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --queue-name $(ServiceBusQueueName) `
+        --resource-group $(ResourceGroupName) `
+        --rights Listen
+  
+  # Create Azure Function
+  - task: AzureCLI@2
+    displayName: "Create Azure Storage Account"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az storage account create `
+        --name $(StorageAccountName) `
+        --resource-group $(ResourceGroupName)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure App Service Plan"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az functionapp plan create `
+        --name $(FunctionPlanName) `
+        --resource-group $(ResourceGroupName) `
+        --sku $(FunctionSku) `
+        --is-linux true
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Function"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az functionapp create `
+        --resource-group $(ResourceGroupName) `
+        --plan $(FunctionPlanName) `
+        --name $(FunctionName) `
+        --storage-account $(StorageAccountName) `
+        --functions-version $(FunctionVersion) `
+        --os-type $(FunctionOs) `
+        --runtime dotnet `
+        --disable-app-insights true
