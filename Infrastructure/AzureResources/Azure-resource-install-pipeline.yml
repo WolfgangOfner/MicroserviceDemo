@@ -13,12 +13,12 @@ variables:
   FunctionOs: Linux
   FunctionPlanName: MicroservicedemoFunctionPlan
   FunctionSku: B1  
-  FunctionVersion: 3    
+  FunctionVersion: 3
   HelmVersion: '3.5.0'
   Kubernetesversion: '1.19.9'
   KubectlVersion: '1.19.9'
   NetworkPlugin: kubenet
-  NodeCount: 1  
+  NodeCount: 1
   NginxNamespace: ingress-basic
   ResourceGroupLocation: westeurope
   ResourceGroupName: MicroserviceDemo  
@@ -46,7 +46,7 @@ steps:
       azureSubscription: '$(AzureSubscription)'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
-      inlineScript: |                
+      inlineScript: |
         az group create -g "$(ResourceGroupName)" -l "$(ResourceGroupLocation)"
 
   # Create AKS
@@ -110,16 +110,38 @@ steps:
       overrideValues: 'installCRDs=true,inodeSelector.kubernetes\.io/os=linux,webhook.nodeSelector.kubernetes\.io/os"=linux,cainjector.nodeSelector."kubernetes\.io/os"=linux'
       arguments: '--create-namespace'
 
-  # Install Cluster Issuer     
-  - task: Kubernetes@1       
+  # Install Cluster Issuer
+  - task: Kubernetes@1
     inputs:
       connectionType: '$(AzureConnectionType)'
       azureSubscriptionEndpoint: 'AzureServiceConnection'
-      azureResourceGroup: $(ResourceGroupName)
-      kubernetesCluster: $(AksClusterName)
+      azureResourceGroup: 'MicroserviceDemo'
+      kubernetesCluster: 'microservice-aks'
       useClusterAdmin: true
       command: 'apply'
-      arguments: '-f https://raw.githubusercontent.com/WolfgangOfner/MicroserviceDemo/master/Infrastructure/AzureResources/scripts/cluster-issuer.yaml'
+      useConfigurationFile: true
+      configurationType: 'inline'
+      inline: |
+        apiVersion: cert-manager.io/v1
+        kind: ClusterIssuer
+        metadata:
+          name: letsencrypt
+        spec:
+          acme:
+            server: https://acme-v02.api.letsencrypt.org/directory
+            email: $(CertIssuerEmail)
+            privateKeySecretRef:
+              name: letsencrypt
+            solvers:
+            - http01:
+                ingress:
+                  class: nginx
+                  podTemplate:
+                    spec:
+                      nodeSelector:
+                        "kubernetes.io/os": linux
+      secretType: 'dockerRegistry'
+      containerRegistryType: 'Azure Container Registry'
     displayName: 'Install Cluster Issuer'
 
   # Install Nginx Ingress Controller
@@ -160,7 +182,7 @@ steps:
       overrideValues: 'controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux'
       namespace: $(NginxNamespace)
       arguments: '--create-namespace'
-
+  
   # Create Azure SQL Server
   - task: AzureCLI@2
     displayName: "Create SQL Server"
