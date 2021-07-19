@@ -17,6 +17,8 @@ variables:
   HelmVersion: '3.5.0'
   Kubernetesversion: '1.19.9'
   KubectlVersion: '1.19.9'
+  LokiVersion: '2.5.2'
+  LokiNamespace: loki-grafana
   NetworkPlugin: kubenet
   NodeCount: 1
   NginxNamespace: ingress-basic
@@ -182,7 +184,47 @@ steps:
       overrideValues: 'controller.replicaCount=2,controller.nodeSelector."beta\.kubernetes\.io/os"=linux,defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux,controller.admissionWebhooks.patch.nodeSelector."beta\.kubernetes\.io/os"=linux'
       namespace: $(NginxNamespace)
       arguments: '--create-namespace'
-  
+
+  # Install Loki Grafana
+  - task: HelmDeploy@0
+    displayName: "Install Loki Grafana (Helm repo add)"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'add loki https://grafana.github.io/loki/charts'
+
+  - task: HelmDeploy@0
+    displayName: "Install Loki Grafana (Helm repo update)"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'update'
+
+  - task: HelmDeploy@0
+    displayName: "Install Loki Grafana"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      namespace: '$(LokiNamespace)'
+      command: 'upgrade'
+      chartType: 'Name'
+      chartName: 'loki/loki-stack'
+      chartVersion: '$(LokiVersion)'
+      releaseName: 'loki'
+      overrideValues: 'grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=true,prometheus.server.persistentVolume.enabled=true,loki.persistence.enabled=true,loki.persistence.size=10Gi'
+      arguments: '--create-namespace'
+
   # Create Azure SQL Server
   - task: AzureCLI@2
     displayName: "Create SQL Server"
