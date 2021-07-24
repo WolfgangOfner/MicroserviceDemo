@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using OrderApi.Data.Database;
 using OrderApi.Data.Repository.v1;
 using OrderApi.Domain;
+using OrderApi.Infrastructure.Prometheus;
 using OrderApi.Messaging.Receive.Options.v1;
 using OrderApi.Messaging.Receive.Receiver.v1;
 using OrderApi.Models.v1;
@@ -25,6 +26,7 @@ using OrderApi.Service.v1.Command;
 using OrderApi.Service.v1.Query;
 using OrderApi.Service.v1.Services;
 using OrderApi.Validators.v1;
+using Prometheus;
 
 namespace OrderApi
 {
@@ -115,6 +117,8 @@ namespace OrderApi
             services.AddTransient<IRequestHandler<PayOrderCommand, Order>, PayOrderCommandHandler>();
             services.AddTransient<IRequestHandler<UpdateOrderCommand>, UpdateOrderCommandHandler>();
             services.AddTransient<ICustomerNameUpdateService, CustomerNameUpdateService>();
+
+            services.AddSingleton<MetricCollecter>();
             
             if (serviceClientSettings.Enabled)
             {
@@ -141,6 +145,11 @@ namespace OrderApi
                 c.RoutePrefix = string.Empty;
             });
             app.UseRouting();
+
+            app.UseMetricServer();
+            app.UseMiddleware<ResponseMetricMiddleware>();
+            app.UseHttpMetrics();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

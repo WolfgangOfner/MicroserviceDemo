@@ -5,6 +5,7 @@ using System.Reflection;
 using CustomerApi.Data.Database;
 using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
+using CustomerApi.Infrastructure.Prometheus;
 using CustomerApi.Messaging.Send.Options.v1;
 using CustomerApi.Messaging.Send.Sender;
 using CustomerApi.Messaging.Send.Sender.v1;
@@ -24,6 +25,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 
 namespace CustomerApi
 {
@@ -125,6 +127,8 @@ namespace CustomerApi
             services.AddTransient<IRequestHandler<UpdateCustomerCommand, Customer>, UpdateCustomerCommandHandler>();
             services.AddTransient<IRequestHandler<GetCustomerByIdQuery, Customer>, GetCustomerByIdQueryHandler>();
             services.AddTransient<IRequestHandler<GetCustomersQuery, List<Customer>>, GetCustomersQueryHandler>();
+
+            services.AddSingleton<MetricCollecter>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -146,6 +150,11 @@ namespace CustomerApi
                 c.RoutePrefix = string.Empty;
             });
             app.UseRouting();
+            
+            app.UseMetricServer();
+            app.UseMiddleware<ResponseMetricMiddleware>();
+            app.UseHttpMetrics();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

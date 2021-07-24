@@ -17,7 +17,7 @@ variables:
   HelmVersion: '3.5.0'
   Kubernetesversion: '1.19.9'
   KubectlVersion: '1.19.9'
-  LokiVersion: '2.5.2'
+  LokiVersion: '2.0.3'
   LokiNamespace: loki-grafana
   NetworkPlugin: kubenet
   NodeCount: 1
