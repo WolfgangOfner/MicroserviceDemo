@@ -14,7 +14,7 @@ namespace CustomerApi.Infrastructure.Prometheus
             _request = request ?? throw new ArgumentNullException(nameof(request));
         }
 
-        public async Task Invoke(HttpContext httpContext, MetricCollecter collecter)
+        public async Task Invoke(HttpContext httpContext, MetricCollector collector)
         {
             var path = httpContext.Request.Path.Value;
 
@@ -35,8 +35,8 @@ namespace CustomerApi.Infrastructure.Prometheus
             {
                 sw.Stop();
                 
-                collecter.RegisterRequest();
-                collecter.RegisterResponseTime(httpContext.Response.StatusCode, httpContext.Request.Method, sw.Elapsed);
+                collector.RegisterRequest();
+                collector.RegisterResponseTime(httpContext.Response.StatusCode, httpContext.Request.Method, sw.Elapsed);
             }
         }
     }

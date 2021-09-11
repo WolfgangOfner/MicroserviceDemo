@@ -118,7 +118,7 @@ namespace OrderApi
             services.AddTransient<IRequestHandler<UpdateOrderCommand>, UpdateOrderCommandHandler>();
             services.AddTransient<ICustomerNameUpdateService, CustomerNameUpdateService>();
 
-            services.AddSingleton<MetricCollecter>();
+            services.AddSingleton<MetricCollector>();
             
             if (serviceClientSettings.Enabled)
             {

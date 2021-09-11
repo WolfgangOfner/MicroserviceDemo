@@ -128,7 +128,7 @@ namespace CustomerApi
             services.AddTransient<IRequestHandler<GetCustomerByIdQuery, Customer>, GetCustomerByIdQueryHandler>();
             services.AddTransient<IRequestHandler<GetCustomersQuery, List<Customer>>, GetCustomersQueryHandler>();
 
-            services.AddSingleton<MetricCollecter>();
+            services.AddSingleton<MetricCollector>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
