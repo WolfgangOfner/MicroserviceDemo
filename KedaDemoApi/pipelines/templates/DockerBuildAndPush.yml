@@ -1,0 +1,73 @@
+parameters:
+  - name: buildId
+    type: string
+    default: 
+  - name: patMicroserviceDemoNugetsFeed
+    type: string
+    default: 
+  - name: containerRegistry
+    type: string
+    default: 
+  - name: repository
+    type: string
+    default: 
+  - name: tag
+    type: string
+    default: 
+  - name: artifactName
+    type: string
+    default:
+
+steps:
+  - task: Docker@2
+    displayName: 'Build Docker Container'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'build'
+      Dockerfile: '**/${{ parameters.artifactName }}/${{ parameters.artifactName }}/Dockerfile'
+      buildContext: ${{ parameters.artifactName }}
+      tags: |      
+        ${{ parameters.tag }}
+        latest
+      arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
+  
+  - pwsh: |
+     $id=docker images --filter "label=test=${{ parameters.buildId }}" -q | Select-Object -First 1
+     docker create --name testcontainer $id
+     docker cp testcontainer:/testresults ./testresults
+     docker rm testcontainer
+    displayName: 'Copy test results' 
+  
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'VSTest'
+      testResultsFiles: '**/*.trx'
+      searchFolder: '$(System.DefaultWorkingDirectory)/testresults'
+    displayName: 'Publish test results'
+  
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/testresults/coverage/coverage.cobertura.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
+    displayName: 'Publish code coverage results'
+
+  - task: Docker@2
+    displayName: 'Push Docker Container'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'push'
+      tags: |      
+        ${{ parameters.tag }}            
+
+  - task: Docker@2
+    displayName: 'Push Docker Container'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'push'
+      tags: |              
+        latest
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

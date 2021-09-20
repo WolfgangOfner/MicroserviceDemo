@@ -1,0 +1,54 @@
+parameters:
+  - name: apiName
+    type: string
+    default: 
+  - name: azureSubscription
+    type: string
+    default:
+  - name: clusterResourceGroup
+    type: string
+    default:
+  - name: chartPackage
+    type: string
+    default:
+  - name: helmVersion
+    type: string
+    default:
+  - name: k8sNamespace
+    type: string
+    default:
+  - name: kubernetesCluster
+    type: string
+    default:
+  - name: releaseValuesFile
+    type: string
+    default: 
+
+steps:
+  - task: Tokenizer@0
+    displayName: 'Run Tokenizer'
+    inputs:
+      sourceFilesPattern: ${{ parameters.releaseValuesFile }}
+
+  - task: HelmInstaller@0
+    displayName: 'Install Helm ${{ parameters.helmVersion }}'
+    inputs:
+      helmVersion: '${{ parameters.helmVersion }}'
+      checkLatestHelmVersion: false
+      installKubectl: true
+  
+  - task: HelmDeploy@0
+    displayName: 'Helm upgrade release'
+    inputs:
+      connectionType: 'Azure Resource Manager'
+      azureSubscription: ${{ parameters.azureSubscription }}
+      azureResourceGroup: ${{ parameters.clusterResourceGroup }}
+      kubernetesCluster: ${{ parameters.kubernetesCluster }}
+      useClusterAdmin: true
+      namespace: ${{ parameters.k8sNamespace }}
+      command: 'upgrade'
+      chartType: 'FilePath'
+      chartPath: ${{ parameters.chartPackage }}
+      releaseName: ${{ parameters.apiName }}-${{ parameters.k8sNamespace }}
+      valueFile: ${{ parameters.releaseValuesFile }}
+      arguments: '--create-namespace'

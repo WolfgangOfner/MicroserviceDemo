@@ -1,0 +1,53 @@
+name : KedaDemoApi-CI
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - KedaDemoApi/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:  
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'kedademoapi'
+  ArtifactName: 'KedaDemoApi'
+  ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
+  BuildId: $(Build.BuildId)
+  BuildNumber: $(GitVersion.FullSemVer)
+  ClusterResourceGroup: MicroserviceDemo    
+  ChartPath: '$(ArtifactName)/$(ArtifactName)/charts/$(ApiName)'
+  HelmVersion: 3.5.0  
+  Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository  
+  KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(ArtifactSourceFolder)/values.release.yaml'    
+
+stages:
+- stage: Build  
+  jobs:  
+  - job: Build
+    displayName: Build and push Docker image and create Helm package
+    steps:
+    - template: templates/BuildVersioning.yml
+    - template: templates/DockerBuildAndPush.yml
+      parameters:
+          buildId: $(BuildId)
+          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)
+          containerRegistry: 'Docker Hub' # MicroserviceDemoRegistry # replace with your Service Connection name
+          repository: $(Repository) 
+          tag: $(BuildNumber)
+          artifactName: $(ArtifactName)
+    - template: templates/CreateHelmPackage.yml
+      parameters:          
+          azureSubscription: $(AzureSubscription)
+          buildNumber: $(BuildNumber)
+          clusterResourceGroup: $(ClusterResourceGroup)          
+          chartPath: $(ChartPath)          
+          kubernetesCluster: $(KubernetesCluster)        
+          releaseValuesFile: $(ReleaseValuesFile)
+          artifactStagingDirectory: $(Build.ArtifactStagingDirectory)
+          artifactName: $(ArtifactName)
+          helmVersion: $(HelmVersion)
+          sourceFolder: $(ArtifactSourceFolder)

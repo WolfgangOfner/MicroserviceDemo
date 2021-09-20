@@ -1,0 +1,63 @@
+# Default values for kedademoapi.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+fullnameOverride: kedademoapi
+replicaCount: 1
+image:
+  repository: wolfgangofner/kedademoapi
+  tag: latest
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+  # Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  # ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+  #
+  # This uses credentials from secret "myRegistryKeySecretName".
+  # - name: myRegistryKeySecretName
+service:
+  type: LoadBalancer
+  port: 80
+
+deployment:
+  containerPort: 80
+
+probes:
+  enabled: false
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  pathType: Prefix
+  namespace: customerapi
+  hosts:
+    - VALUE_TO_OVERRIDE
+  tls:
+    - secretName: VALUE_TO_OVERRIDE
+      hosts:
+        - VALUE_TO_OVERRIDE
+secrets: {}
+  # Optionally specify a set of secret objects whose values
+  # will be injected as environment variables by default.
+  # You should add this section to a file like secrets.yaml
+  # that is explicitly NOT committed to source code control
+  # and then include it as part of your helm install step.
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  #
+  # This creates a secret "mysecret" and injects "mypassword"
+  # as the environment variable mysecret_mypassword=password.
+  # mysecret:
+  #   mypassword: password
+resources:
+   limits:
+    cpu: 0.3
+    memory: 128Mi
+   requests:
+    cpu: 100m
+    memory: 64Mi
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

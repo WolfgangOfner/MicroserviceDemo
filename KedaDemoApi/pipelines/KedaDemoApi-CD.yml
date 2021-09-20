@@ -1,0 +1,82 @@
+name : KedaDemoApi-CD
+trigger: none
+resources:
+  pipelines:
+   - pipeline: KedaDemoApiBuild
+     source: KedaDemoApi-CI
+     trigger:
+      branches:
+       include:
+         - master         
+         - pull/*
+         - refs/pull/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:  
+  AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
+  ApiName: 'kedademoapi'
+  ArtifactName: 'KedaDemoApi'
+  ClusterResourceGroup: MicroserviceDemo
+  ChartPackage: '$(Pipeline.Workspace)/KedaDemoApiBuild/KedaDemoApi/kedademoapi-$(resources.pipeline.KedaDemoApiBuild.runname).tgz' 
+  HelmVersion: 3.5.0    
+  KubernetesCluster: 'microservice-aks'
+  ReleaseValuesFile: '$(Pipeline.Workspace)/KedaDemoApiBuild/KedaDemoApi/values.release.yaml'
+  TlsSecretName: kedademoapi-tls
+  
+stages:
+- stage: Test     
+  condition: startsWith(variables['resources.pipeline.KedaDemoApiBuild.sourcebranch'], 'refs/heads/master')
+  variables:
+    DeploymentEnvironment: 'test'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    URL: $(DeploymentEnvironment).kedademo.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Test
+    displayName: 'Deploy KedaDemoApi to the kedademoapi-test environment'
+    environment: kedademoapi-test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: KedaDemoApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)' 
+ 
+- stage: Prod
+  dependsOn: Test
+  condition: and(succeeded(), startsWith(variables['resources.pipeline.KedaDemoApiBuild.sourcebranch'], 'refs/heads/master'))
+  variables:
+    DeploymentEnvironment: 'prod'
+    K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
+    URL: kedademo.programmingwithwolfgang.com # replace with your service url
+  jobs:
+  - deployment: Web_Prod
+    displayName: 'Deploy KedaDemoApi to the kedademoapi-prod environment'
+    environment: kedademoapi-prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: KedaDemoApiBuild
+            artifact: $(ArtifactName)
+          - template: templates/DeployHelmPackage.yml
+            parameters:
+              apiName: $(ApiName)
+              azureSubscription: '$(AzureSubscription)'
+              clusterResourceGroup: '$(ClusterResourceGroup)'
+              chartPackage: '$(ChartPackage)'              
+              helmVersion: $(HelmVersion)
+              k8sNamespace: $(K8sNamespace)
+              kubernetesCluster: $(KubernetesCluster)
+              releaseValuesFile: '$(ReleaseValuesFile)'  

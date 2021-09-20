@@ -1,0 +1,18 @@
+parameters:
+  - name: blockOnPossibleDataLoss
+    type: string
+    default: false 
+  - name: generateSmartDefaults
+    type: string
+    default: true
+  - name: connectionString
+    type: string
+    default:
+  - name: dacpacPath
+    type: string
+    default:
+
+steps:
+  - pwsh: |
+      /opt/sqlpackage/sqlpackage /a:Publish /p:BlockOnPossibleDataLoss=${{ parameters.blockOnPossibleDataLoss }} /p:GenerateSmartDefaults=${{ parameters.generateSmartDefaults }} /tcs:"${{ parameters.connectionString }}" /sf:"${{ parameters.dacpacPath }}"    
+    displayName: 'Deploy DACPAC'
