@@ -16,6 +16,7 @@ namespace CustomerApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                
                 });
         }
     }
