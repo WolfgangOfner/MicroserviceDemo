@@ -31,7 +31,7 @@ services:
         ports:
             - 9000:80
             - 9001:443
-        environment:
+        #environment:
         #    - "ASPNETCORE_URLS=https://+;http://+"
         #    - Kestrel__Certificates__Default__Path=/app/Infrastructure/Certificate/cert-aspnetcore.pfx
         #    - Kestrel__Certificates__Default__Password=SecretPassword       

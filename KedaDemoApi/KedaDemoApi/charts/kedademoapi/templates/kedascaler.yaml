@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: '{{ template "kedademoapi.fullname" . }}-scaler'
+spec:
+  scaleTargetRef:
+    name: {{ template "kedademoapi.fullname" . }}
+  minReplicaCount: {{ .Values.kedascaler.minReplicaCount }}
+  maxReplicaCount: {{ .Values.kedascaler.maxReplicaCount }}
+  cooldownPeriod: {{ .Values.kedascaler.cooldownPeriod }}
+  triggers:
+  - type: azure-servicebus
+    metadata:
+      queueName: {{ .Values.kedascaler.queueName }}
+      queueLength: "{{ .Values.kedascaler.queueLength }}"
+    authenticationRef:
+      name: trigger-authentication-{{ template "kedademoapi.fullname" . }}

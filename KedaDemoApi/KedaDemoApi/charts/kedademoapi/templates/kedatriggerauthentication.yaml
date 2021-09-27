@@ -1,0 +1,9 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: 'trigger-authentication-{{ template "kedademoapi.fullname" . }}'
+spec:
+  secretTargetRef:
+  - parameter: connection
+    name: {{ .Values.triggerauth.secretName }}
+    key: {{ .Values.triggerauth.secretKey }}

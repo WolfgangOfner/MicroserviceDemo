@@ -7,7 +7,7 @@ variables:
   AksClusterName: microservice-aks
   AzureSubscription: AzureServiceConnection # replace with your subscription connection name
   AzureConnectionType: Azure Resource Manager 
-  CertIssuerEmail: <your email>  # replace with your email
+  CertIssuerEmail: #<your email>  # replace with your email
   CertManagerNamespace: cert-manager  
   FunctionName: OrderApiMessagingReceive # replace with unique name
   FunctionOs: Linux
@@ -15,8 +15,10 @@ variables:
   FunctionSku: B1  
   FunctionVersion: 3
   HelmVersion: '3.5.0'
-  Kubernetesversion: '1.19.9'
-  KubectlVersion: '1.19.9'
+  KedaNamespace: keda
+  KedaVersion: 2.4
+  Kubernetesversion: '1.21.2'
+  KubectlVersion: '1.21.2'
   LokiVersion: '2.0.3'
   LokiNamespace: loki-grafana
   NetworkPlugin: kubenet
@@ -223,6 +225,45 @@ steps:
       chartVersion: '$(LokiVersion)'
       releaseName: 'loki'
       overrideValues: 'grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=true,prometheus.server.persistentVolume.enabled=true,loki.persistence.enabled=true,loki.persistence.size=10Gi'
+      arguments: '--create-namespace'
+
+  # Install KEDA
+  - task: HelmDeploy@0
+    displayName: "Install KEDA (Helm repo add)"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'add kedacore https://kedacore.github.io/charts'
+
+  - task: HelmDeploy@0
+    displayName: "Install KEDA (Helm repo update)"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      command: 'repo'
+      arguments: 'update'
+
+  - task: HelmDeploy@0
+    displayName: "Install KEDA"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      namespace: '$(KedaNamespace)'
+      command: 'upgrade'
+      chartType: 'Name'
+      chartName: 'kedacore/keda'
+      chartVersion: '$(KedaVersion)'
+      releaseName: 'keda'
       arguments: '--create-namespace'
 
   # Create Azure SQL Server

@@ -61,3 +61,14 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+kedascaler:
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  cooldownPeriod: 30
+  queueName: KedaDemo
+  queueLength: "5"
+
+triggerauth:
+  secretName: kedademoapi-connectionstrings
+  secretKey: AzureServiceBus__ConnectionString

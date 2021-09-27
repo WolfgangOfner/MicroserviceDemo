@@ -13,8 +13,8 @@ probes:
 imagePullSecrets:
   - name: acr-secret
 
-#service:
-#  type: ClusterIP
+service:
+  type: ClusterIP
   
 ingress:
   enabled: __IngressEnabled__
