@@ -3,12 +3,16 @@ trigger: none
 pool:
   vmImage: "ubuntu-latest"
 
+# For more information see https://www.programmingwithwolfgang.com/use-infrastructure-as-code-to-deploy-infrastructure/
 variables:  
   AksClusterName: microservice-aks
   AzureSubscription: AzureServiceConnection # replace with your subscription connection name
   AzureConnectionType: Azure Resource Manager 
   CertIssuerEmail: #<your email>  # replace with your email
-  CertManagerNamespace: cert-manager  
+  CertManagerNamespace: cert-manager 
+  DnsLockName: DeleteDns 
+  DnsRecords: "@('*.customer','*.order','*.kedademo')" # replace with your A records
+  DnsZoneName: programmingwithwolfgang.com # replace with your DNS zone
   FunctionName: OrderApiMessagingReceive # replace with unique name
   FunctionOs: Linux
   FunctionPlanName: MicroservicedemoFunctionPlan
@@ -76,6 +80,7 @@ steps:
             --generate-ssh-keys
 
   # Install Cert Manager
+  # For more information see https://www.programmingwithwolfgang.com/automatically-issue-ssl-certificates-and-use-ssl-termination-in-kubernetes/
   - task: HelmDeploy@0
     displayName: "Install cert manager"
     inputs:
@@ -114,7 +119,7 @@ steps:
       overrideValues: 'installCRDs=true,inodeSelector.kubernetes\.io/os=linux,webhook.nodeSelector.kubernetes\.io/os"=linux,cainjector.nodeSelector."kubernetes\.io/os"=linux'
       arguments: '--create-namespace'
 
-  # Install Cluster Issuer
+  # Install Cluster Issuer  
   - task: Kubernetes@1
     inputs:
       connectionType: '$(AzureConnectionType)'
@@ -148,7 +153,8 @@ steps:
       containerRegistryType: 'Azure Container Registry'
     displayName: 'Install Cluster Issuer'
 
-  # Install Nginx Ingress Controller
+  # Install Nginx Ingress Controller  
+  # For more information see https://www.programmingwithwolfgang.com/setup-nginx-ingress-controller-kubernetes/
   - task: HelmDeploy@0
     displayName: "Install ingress-nginx (Helm repo add)"
     inputs:
@@ -188,6 +194,7 @@ steps:
       arguments: '--create-namespace'
 
   # Install Loki Grafana
+  # For more information see https://www.programmingwithwolfgang.com/collect-and-query-kubernetes-logs-with-grafana-loki
   - task: HelmDeploy@0
     displayName: "Install Loki Grafana (Helm repo add)"
     inputs:
@@ -228,6 +235,7 @@ steps:
       arguments: '--create-namespace'
 
   # Install KEDA
+  # For more information see https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscalling/
   - task: HelmDeploy@0
     displayName: "Install KEDA (Helm repo add)"
     inputs:
@@ -265,6 +273,67 @@ steps:
       chartVersion: '$(KedaVersion)'
       releaseName: 'keda'
       arguments: '--create-namespace'
+
+  # For more information see https://www.programmingwithwolfgang.com/update-dns-records-in-an-azure-devops-pipeline
+  # Update DNS Records
+  - task: AzureCLI@2
+    displayName: "Delete CanNotDelete Lock on DNS Zone"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        $dnsId = az lock list --query "[?name=='$(DnsLockName)'].id" -o tsv
+        if ($dnsId) 
+        {         
+          az lock delete --ids $dnsId
+        }
+
+  - task: AzureCLI@2
+    displayName: "Get Nginx Ingress public IP"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        $publicIpName = az network public-ip list --query "[?tags.service=='ingress-basic/ingress-nginx-controller'].name" -o tsv        
+        $ingressIp = az network public-ip show -g MC_$(ResourceGroupName)_$(AksClusterName)_$(ResourceGroupLocation) -n $publicIpName --query ipAddress
+        Write-Host "##vso[task.setvariable variable=IngressIp;]$ingressIp"        
+
+  - task: AzureCLI@2
+    displayName: "Delete existing DND Records"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        ForEach ($dnsRecord in $(DnsRecords)) {
+          $ipAddress = az network dns record-set a show -g $(ResourceGroupName) -z $(DnsZoneName) --name $dnsRecord -o json --query aRecords[0].ipv4Address 
+          if ($ipAddress) 
+          {         
+            az network dns record-set a remove-record -g $(ResourceGroupName) -z $(DnsZoneName) --record-set-name $dnsRecord --ipv4-address $ipAddress
+          }          
+        }
+
+  - task: AzureCLI@2
+    displayName: "Set DNS A records"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        ForEach ($dnsRecord in $(DnsRecords)) {
+          az network dns record-set a add-record -g $(ResourceGroupName) -z $(DnsZoneName) -n $dnsRecord -a $(IngressIp)
+        }        
+
+  - task: AzureCLI@2
+    displayName: "Create CanNotDelete Lock on DNS Zone"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az lock create -t CanNotDelete -n $(DnsLockName) -g $(ResourceGroupName) --resource $(DnsZoneName) --resource-type Microsoft.Network/dnszones
 
   # Create Azure SQL Server
   - task: AzureCLI@2
