@@ -7,7 +7,6 @@ using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
 using CustomerApi.Infrastructure.Prometheus;
 using CustomerApi.Messaging.Send.Options.v1;
-using CustomerApi.Messaging.Send.Sender;
 using CustomerApi.Messaging.Send.Sender.v1;
 using CustomerApi.Models.v1;
 using CustomerApi.Service.v1.Command;
@@ -20,6 +19,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +55,11 @@ namespace CustomerApi
             {
                 services.AddDbContext<CustomerContext>(options =>
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("CustomerDatabase"));
+                    SqlAuthenticationProvider.SetProvider(
+                        SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
+                        new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
+                    var sqlConnection = new SqlConnection(Configuration.GetConnectionString("CustomerDatabase"));
+                    options.UseSqlServer(sqlConnection);
                 });
             }
             else
@@ -141,7 +145,7 @@ namespace CustomerApi
             {
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -150,11 +154,11 @@ namespace CustomerApi
                 c.RoutePrefix = string.Empty;
             });
             app.UseRouting();
-            
+
             app.UseMetricServer();
             app.UseMiddleware<ResponseMetricMiddleware>();
             app.UseHttpMetrics();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

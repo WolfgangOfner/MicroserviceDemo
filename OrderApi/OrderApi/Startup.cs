@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +55,11 @@ namespace OrderApi
             {
                 services.AddDbContext<OrderContext>(options =>
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("OrderDatabase"));
+                    SqlAuthenticationProvider.SetProvider(
+                        SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
+                        new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
+                    var sqlConnection = new SqlConnection(Configuration.GetConnectionString("OrderDatabase"));
+                    options.UseSqlServer(sqlConnection);
                 });
             }
             else
