@@ -54,7 +54,7 @@ namespace OrderApi.Controllers.v1
         }
 
         /// <summary>
-        ///     Action to retrieve all pay orders.
+        ///     Action to retrieve all paid orders.
         /// </summary>
         /// <returns>Returns a list of all paid orders or an empty list, if no order is paid yet</returns>
         /// <response code="200">Returned if the list of orders was retrieved</response>
