@@ -30,3 +30,6 @@ ingress:
     - secretName: __TlsSecretName__
       hosts:
         - __URL__
+
+envvariables:
+  tenantId: __TenantId__

@@ -95,7 +95,7 @@ namespace CustomerApi.Test.Controllers.v1
             (result.Result as StatusCodeResult)?.StatusCode.Should().Be((int) HttpStatusCode.BadRequest);
             (result.Result as BadRequestObjectResult)?.Value.Should().Be(exceptionMessage);
         }
-
+        
         [Fact]
         public async void Get_ShouldReturnCustomers()
         {
@@ -105,7 +105,7 @@ namespace CustomerApi.Test.Controllers.v1
             result.Value.Should().BeOfType<List<Customer>>();
             result.Value.Count.Should().Be(2);
         }
-
+        
         [Theory]
         [InlineData("Customers could not be loaded")]
         public async void Get_WhenAnExceptionOccurs_ShouldReturnBadRequest(string exceptionMessage)

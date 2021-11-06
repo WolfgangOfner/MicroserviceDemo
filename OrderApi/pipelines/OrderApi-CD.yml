@@ -10,7 +10,7 @@ resources:
      trigger:
       branches:
        include:
-         - master         
+         - master
          - pull/*
          - refs/pull/*
 
@@ -20,7 +20,7 @@ pool:
 variables:  
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'orderapi'
-  ArtifactName: 'OrderApi'      
+  ArtifactName: 'OrderApi'
   ClusterResourceGroup: MicroserviceDemo  
   ChartPackage: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/orderapi-$(resources.pipeline.OrderApiBuild.runname).tgz'  
   DatabaseName: Order
@@ -29,7 +29,7 @@ variables:
   ReleaseValuesFile: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/values.release.yaml'
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
-  TlsSecretName: orderapi-tls  
+  TlsSecretName: orderapi-tls
 
 stages:
 - stage: PR_Deploy
@@ -41,12 +41,12 @@ stages:
     URL: $(DeploymentEnvironment).order.programmingwithwolfgang.com # replace with your service url     
   jobs:
   - deployment: Web_PR
-    environment: "orderapi-PR-Deploy" 
+    environment: "orderapi-PR-Deploy"
     displayName: 'Deploy OrderApi to the PR environment'    
     strategy:
       runOnce:
         deploy:
-          steps:           
+          steps:
           - download: OrderApiBuild
             artifact: $(ArtifactName)
           - template: templates/GetPrId.yml
@@ -62,7 +62,7 @@ stages:
               releaseValuesFile: '$(ReleaseValuesFile)' 
  
 - stage: PR_Delete
-  dependsOn: PR_Deploy  
+  dependsOn: PR_Deploy
   condition: succeeded('PR_Deploy')
   variables:
     K8sNamespace: '$(ApiName)-pr-$(prId)'
@@ -76,10 +76,10 @@ stages:
          steps:
          - download: none
          - template: templates/GetPrId.yml
-         - task: Kubernetes@1       
+         - task: Kubernetes@1
            inputs:
              connectionType: 'Azure Resource Manager'
-             azureSubscriptionEndpoint: 'AzureServiceConnection'
+             azureSubscriptionEndpoint: '$(AzureSubscription)'
              azureResourceGroup: $(ClusterResourceGroup)
              kubernetesCluster: $(KubernetesCluster)
              useClusterAdmin: true
@@ -109,7 +109,7 @@ stages:
               apiName: $(ApiName)
               azureSubscription: '$(AzureSubscription)'
               clusterResourceGroup: '$(ClusterResourceGroup)'
-              chartPackage: '$(ChartPackage)'              
+              chartPackage: '$(ChartPackage)'
               helmVersion: $(HelmVersion)
               k8sNamespace: $(K8sNamespace)
               kubernetesCluster: $(KubernetesCluster)
@@ -155,7 +155,7 @@ stages:
               apiName: $(ApiName)
               azureSubscription: '$(AzureSubscription)'
               clusterResourceGroup: '$(ClusterResourceGroup)'
-              chartPackage: '$(ChartPackage)'              
+              chartPackage: '$(ChartPackage)'
               helmVersion: $(HelmVersion)
               k8sNamespace: $(K8sNamespace)
               kubernetesCluster: $(KubernetesCluster)
@@ -174,6 +174,6 @@ stages:
           - download: OrderApiBuild
             artifact: dacpacs
           - template: templates/DatabaseDeploy.yml
-            parameters:          
+            parameters:
                 connectionString: $(ConnectionString)
                 dacpacPath: "$(Pipeline.Workspace)/OrderApiBuild/dacpacs/$(ArtifactName).Database.Build.dacpac"
