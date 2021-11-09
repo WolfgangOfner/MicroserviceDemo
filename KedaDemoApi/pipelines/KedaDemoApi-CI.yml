@@ -34,7 +34,6 @@ stages:
     - template: templates/DockerBuildAndPush.yml
       parameters:
           buildId: $(BuildId)
-          patMicroserviceDemoNugetsFeed: $(PatMicroserviceDemoNugetsFeed)
           containerRegistry: 'Docker Hub' # MicroserviceDemoRegistry # replace with your Service Connection name
           repository: $(Repository) 
           tag: $(BuildNumber)

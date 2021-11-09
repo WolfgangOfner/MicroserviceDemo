@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 		pipelines\templates\DeployHelmPackage.yml = pipelines\templates\DeployHelmPackage.yml
 		pipelines\templates\DockerBuildAndPush.yml = pipelines\templates\DockerBuildAndPush.yml
 		pipelines\templates\GetPrId.yml = pipelines\templates\GetPrId.yml
+		pipelines\templates\GetServiceBusConnectionString.yml = pipelines\templates\GetServiceBusConnectionString.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{8AD01843-F038-4CAB-8915-7E1CC1F78DF1}"

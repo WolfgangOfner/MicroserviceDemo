@@ -27,6 +27,9 @@ variables:
   HelmVersion: 3.5.0    
   KubernetesCluster: 'microservice-aks'
   ReleaseValuesFile: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/values.release.yaml'
+  ServiceBusNamespaceName: microservicedemo
+  ServiceBusQueueName: CustomerQueue
+  ServiceBusQueueSasName: ReceiveKey
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
   TlsSecretName: orderapi-tls
@@ -104,6 +107,13 @@ stages:
           steps:
           - download: OrderApiBuild
             artifact: $(ArtifactName)
+          - template: templates/GetServiceBusConnectionString.yml
+            parameters:
+              azureSubscription: $(AzureSubscription)
+              resourceGroup: $(ClusterResourceGroup)
+              serviceBusNamespaceName: $(ServiceBusNamespaceName)
+              serviceBusQueueName: $(ServiceBusQueueName)
+              serviceBusQueueSasName: $(ServiceBusQueueSasName)
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)
@@ -150,6 +160,13 @@ stages:
           steps:
           - download: OrderApiBuild
             artifact: $(ArtifactName)
+          - template: templates/GetServiceBusConnectionString.yml
+            parameters:
+              azureSubscription: $(AzureSubscription)
+              resourceGroup: $(ClusterResourceGroup)
+              serviceBusNamespaceName: $(ServiceBusNamespaceName)
+              serviceBusQueueName: $(ServiceBusQueueName)
+              serviceBusQueueSasName: $(ServiceBusQueueSasName)
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)

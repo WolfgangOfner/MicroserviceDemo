@@ -1,0 +1,27 @@
+parameters:
+  - name: azureSubscription
+    type: string
+    default:
+  - name: resourceGroup
+    type: string
+    default: 
+  - name: serviceBusNamespaceName
+    type: string
+    default:
+  - name: serviceBusQueueName
+    type: string
+    default: 
+  - name: serviceBusQueueSasName
+    type: string
+    default:
+
+steps:
+  - task: AzureCLI@2
+    displayName: "Read Connection String for Azure Service Bus Queue"
+    inputs:
+      azureSubscription: '${{ parameters.azureSubscription }}'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |        
+        $connectionString = "$(az servicebus queue authorization-rule keys list -g '${{ parameters.resourceGroup }}' --namespace-name '${{ parameters.serviceBusNamespaceName }}' -n '${{ parameters.serviceBusQueueSasName }}' --queue-name '${{ parameters.serviceBusQueueName }}' --query primaryConnectionString)"
+        Write-Host "##vso[task.setvariable variable=AzureServiceBusConnectionString;]$connectionString"
