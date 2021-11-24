@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CustomerApi.Data.Database;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 
 namespace CustomerApi.Data.Test.Infrastructure
 {

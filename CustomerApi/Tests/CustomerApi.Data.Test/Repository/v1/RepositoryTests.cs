@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using CustomerApi.Data.Database;
-using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
 using CustomerApi.Data.Test.Infrastructure;
+using CustomerApi.Domain.Entities;
 using FakeItEasy;
 using FluentAssertions;
 using Xunit;
@@ -12,15 +12,15 @@ namespace CustomerApi.Data.Test.Repository.v1
 {
     public class RepositoryTests : DatabaseTestBase
     {
-        private readonly CustomerContext _CustomerContext;
+        private readonly CustomerContext _customerContext;
         private readonly Repository<Customer> _testee;
         private readonly Repository<Customer> _testeeFake;
         private readonly Customer _newCustomer;
 
         public RepositoryTests()
         {
-            _CustomerContext = A.Fake<CustomerContext>();
-            _testeeFake = new Repository<Customer>(_CustomerContext);
+            _customerContext = A.Fake<CustomerContext>();
+            _testeeFake = new Repository<Customer>(_customerContext);
             _testee = new Repository<Customer>(Context);
             _newCustomer = new Customer
             {
@@ -47,15 +47,15 @@ namespace CustomerApi.Data.Test.Repository.v1
         [Fact]
         public void AddAsync_WhenEntityIsNull_ThrowsException()
         {
-            _testee.Invoking(x => x.AddAsync(null)).Should().Throw<ArgumentNullException>();
+            _testee.Invoking(x => x.AddAsync(null)).Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
         public void AddAsync_WhenExceptionOccurs_ThrowsException()
         {
-            A.CallTo(() => _CustomerContext.SaveChangesAsync(default)).Throws<Exception>();
+            A.CallTo(() => _customerContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.AddAsync(new Customer())).Should().Throw<Exception>().WithMessage("entity could not be saved: Exception of type 'System.Exception' was thrown.");
+            _testeeFake.Invoking(x => x.AddAsync(new Customer())).Should().ThrowAsync<Exception>().WithMessage("entity could not be saved: Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace CustomerApi.Data.Test.Repository.v1
         [Fact]
         public void GetAll_WhenExceptionOccurs_ThrowsException()
         {
-            A.CallTo(() => _CustomerContext.Set<Customer>()).Throws<Exception>();
+            A.CallTo(() => _customerContext.Set<Customer>()).Throws<Exception>();
 
             _testeeFake.Invoking(x => x.GetAll()).Should().Throw<Exception>().WithMessage("Couldn't retrieve entities: Exception of type 'System.Exception' was thrown.");
         }
@@ -87,15 +87,15 @@ namespace CustomerApi.Data.Test.Repository.v1
         [Fact]
         public void UpdateAsync_WhenEntityIsNull_ThrowsException()
         {
-            _testee.Invoking(x => x.UpdateAsync(null)).Should().Throw<ArgumentNullException>();
+            _testee.Invoking(x => x.UpdateAsync(null)).Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
         public void UpdateAsync_WhenExceptionOccurs_ThrowsException()
         {
-            A.CallTo(() => _CustomerContext.SaveChangesAsync(default)).Throws<Exception>();
+            A.CallTo(() => _customerContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.UpdateAsync(new Customer())).Should().Throw<Exception>().WithMessage("entity could not be updated Exception of type 'System.Exception' was thrown.");
+            _testeeFake.Invoking(x => x.UpdateAsync(new Customer())).Should().ThrowAsync<Exception>().WithMessage("entity could not be updated Exception of type 'System.Exception' was thrown.");
         }
     }
 }

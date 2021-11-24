@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Models.v1;
 
 namespace CustomerApi.Infrastructure.AutoMapper

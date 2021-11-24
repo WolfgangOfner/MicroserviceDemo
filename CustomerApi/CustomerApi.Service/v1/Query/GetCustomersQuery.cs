@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using MediatR;
 
 namespace CustomerApi.Service.v1.Query

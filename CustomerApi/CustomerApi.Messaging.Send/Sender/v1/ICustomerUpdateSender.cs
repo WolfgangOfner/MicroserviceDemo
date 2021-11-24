@@ -1,4 +1,4 @@
-﻿using CustomerApi.Data.Entities;
+﻿using CustomerApi.Domain.Entities;
 
 namespace CustomerApi.Messaging.Send.Sender.v1
 {

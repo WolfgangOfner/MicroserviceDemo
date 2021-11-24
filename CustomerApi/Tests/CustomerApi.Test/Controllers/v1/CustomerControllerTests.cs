@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using AutoMapper;
 using CustomerApi.Controllers.v1;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Models.v1;
 using CustomerApi.Service.v1.Command;
 using CustomerApi.Service.v1.Query;

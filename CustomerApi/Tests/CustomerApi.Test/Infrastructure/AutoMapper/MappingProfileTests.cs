@@ -1,6 +1,6 @@
 ﻿using System;
 using AutoMapper;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Infrastructure.AutoMapper;
 using CustomerApi.Models.v1;
 using FluentAssertions;

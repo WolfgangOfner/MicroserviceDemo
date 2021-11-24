@@ -70,7 +70,8 @@ namespace OrderApi
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
-
+            
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -85,10 +86,6 @@ namespace OrderApi
                         Url = new Uri("https://www.programmingwithwolfgang.com/")
                     }
                 });
-
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
             });
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -144,11 +141,7 @@ namespace OrderApi
 
             app.UseHttpsRedirection();
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order API V1");
-                c.RoutePrefix = string.Empty;
-            });
+            app.UseSwaggerUI();
             app.UseRouting();
 
             app.UseMetricServer();

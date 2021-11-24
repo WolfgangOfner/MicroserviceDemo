@@ -59,7 +59,7 @@ namespace OrderApi.Data.Test.Repository.v1
         [Fact]
         public void AddAsync_WhenEntityIsNull_ThrowsException()
         {
-            _testee.Invoking(x => x.AddAsync(null)).Should().Throw<ArgumentNullException>();
+            _testee.Invoking(x => x.AddAsync(null)).Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.AddAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be saved Exception of type 'System.Exception' was thrown.");
+            _testeeFake.Invoking(x => x.AddAsync(new Order())).Should().ThrowAsync<Exception>().WithMessage("entity could not be saved Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace OrderApi.Data.Test.Repository.v1
         [Fact]
         public void UpdateAsync_WhenEntityIsNull_ThrowsException()
         {
-            _testee.Invoking(x => x.UpdateAsync(null)).Should().Throw<ArgumentNullException>();
+            _testee.Invoking(x => x.UpdateAsync(null)).Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
@@ -107,13 +107,13 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.UpdateAsync(new Order())).Should().Throw<Exception>().WithMessage("entity could not be updated Exception of type 'System.Exception' was thrown.");
+            _testeeFake.Invoking(x => x.UpdateAsync(new Order())).Should().ThrowAsync<Exception>().WithMessage("entity could not be updated Exception of type 'System.Exception' was thrown.");
         }
 
         [Fact]
         public void UpdateRangeAsync_WhenEntityIsNull_ThrowsException()
         {
-            _testee.Invoking(x => x.UpdateRangeAsync(null)).Should().Throw<ArgumentNullException>();
+            _testee.Invoking(x => x.UpdateRangeAsync(null)).Should().ThrowAsync<ArgumentNullException>();
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace OrderApi.Data.Test.Repository.v1
         {
             A.CallTo(() => _orderContext.SaveChangesAsync(default)).Throws<Exception>();
 
-            _testeeFake.Invoking(x => x.UpdateRangeAsync(new List<Order>())).Should().Throw<Exception>().WithMessage("entities could not be updated Exception of type 'System.Exception' was thrown.");
+            _testeeFake.Invoking(x => x.UpdateRangeAsync(new List<Order>())).Should().ThrowAsync<Exception>().WithMessage("entities could not be updated Exception of type 'System.Exception' was thrown.");
         }
     }
 }

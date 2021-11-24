@@ -1,5 +1,5 @@
-﻿using CustomerApi.Data.Entities;
-using CustomerApi.Data.Repository.v1;
+﻿using CustomerApi.Data.Repository.v1;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Messaging.Send.Sender.v1;
 using CustomerApi.Service.v1.Command;
 using FakeItEasy;

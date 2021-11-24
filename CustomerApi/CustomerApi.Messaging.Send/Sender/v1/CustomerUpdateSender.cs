@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Messaging.Send.Options.v1;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;

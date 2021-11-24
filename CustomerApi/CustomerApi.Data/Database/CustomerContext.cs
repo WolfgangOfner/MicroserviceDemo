@@ -1,5 +1,5 @@
 ﻿using System;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerApi.Data.Database

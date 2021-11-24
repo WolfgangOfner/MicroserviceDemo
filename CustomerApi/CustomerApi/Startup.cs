@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using CustomerApi.Data.Database;
-using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Infrastructure.Prometheus;
 using CustomerApi.Messaging.Send.Options.v1;
 using CustomerApi.Messaging.Send.Sender.v1;
@@ -70,7 +69,8 @@ namespace CustomerApi
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
-
+            
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -85,10 +85,6 @@ namespace CustomerApi
                         Url = new Uri("https://www.programmingwithwolfgang.com/")
                     }
                 });
-
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
             });
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -148,11 +144,7 @@ namespace CustomerApi
 
             app.UseHttpsRedirection();
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Customer API V1");
-                c.RoutePrefix = string.Empty;
-            });
+            app.UseSwaggerUI();
             app.UseRouting();
 
             app.UseMetricServer();

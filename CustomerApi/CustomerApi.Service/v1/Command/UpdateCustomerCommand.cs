@@ -1,4 +1,4 @@
-﻿using CustomerApi.Data.Entities;
+﻿using CustomerApi.Domain.Entities;
 using MediatR;
 
 namespace CustomerApi.Service.v1.Command

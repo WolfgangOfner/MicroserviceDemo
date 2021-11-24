@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CustomerApi.Data.Database;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerApi.Data.Repository.v1

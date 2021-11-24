@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using CustomerApi.Data.Entities;
+using CustomerApi.Domain.Entities;
 using CustomerApi.Models.v1;
 using CustomerApi.Service.v1.Command;
 using CustomerApi.Service.v1.Query;

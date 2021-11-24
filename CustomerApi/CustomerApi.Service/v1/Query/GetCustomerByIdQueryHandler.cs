@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CustomerApi.Data.Entities;
 using CustomerApi.Data.Repository.v1;
+using CustomerApi.Domain.Entities;
 using MediatR;
 
 namespace CustomerApi.Service.v1.Query
