@@ -25,7 +25,7 @@ variables:
   KubectlVersion: '1.21.2'
   LokiVersion: '2.0.3'
   LokiNamespace: loki-grafana
-  NetworkPlugin: kubenet
+  NetworkPlugin: azure
   NodeCount: 1
   NginxNamespace: ingress-basic
   ResourceGroupLocation: westeurope
@@ -35,6 +35,7 @@ variables:
   ServiceBusQueueName: CustomerQueue
   ServiceBusQueueSasListenName: ReceiveKey
   ServiceBusQueueSasSendName: SendKey  
+  ServiceBusQueueSasManageName: ManageKey
   SqlServerName: wolfgangmicroservicedemosql # replace with unique name
   StorageAccountName: orderreceivestorage # replace with unique name
 
@@ -56,6 +57,17 @@ steps:
       scriptLocation: 'inlineScript'
       inlineScript: |
         az group create -g "$(ResourceGroupName)" -l "$(ResourceGroupLocation)"
+
+  - task: AzureCLI@2
+    displayName: "Enable Pod Identity"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az feature register --name EnablePodIdentityPreview --namespace Microsoft.ContainerService
+        az extension add --name aks-preview
+        az extension update --name aks-preview
 
   # Create AKS
   - task: AzureCLI@2
@@ -82,7 +94,8 @@ steps:
             --min-count 1 `
             --max-count 3 `
             --cluster-autoscaler-profile scale-down-delay-after-add=30s `
-            --cluster-autoscaler-profile scale-down-unneeded-time=1m
+            --cluster-autoscaler-profile scale-down-unneeded-time=1m `
+            --enable-pod-identity
 
   # Install Cert Manager
   # For more information see https://www.programmingwithwolfgang.com/automatically-issue-ssl-certificates-and-use-ssl-termination-in-kubernetes/
@@ -422,6 +435,20 @@ steps:
 #        --queue-name $(ServiceBusQueueName) `
 #        --resource-group $(ResourceGroupName) `
 #        --rights Listen
+#
+#  - task: AzureCLI@2
+#    displayName: "Create Azure Service Bus Queue Manage SAS"
+#    inputs:
+#      azureSubscription: '$(AzureSubscription)'
+#      scriptType: 'pscore'
+#      scriptLocation: 'inlineScript'
+#      inlineScript: |
+#        az servicebus queue authorization-rule create `
+#        --name $(ServiceBusQueueSasManageName) `
+#        --namespace-name $(ServiceBusNamespaceName) `
+#        --queue-name $(ServiceBusQueueNameKeda) `
+#        --resource-group $(ResourceGroupName) `
+#        --rights Manage Send Listen
 #  
 #  # Create Azure Function
 #  - task: AzureCLI@2
