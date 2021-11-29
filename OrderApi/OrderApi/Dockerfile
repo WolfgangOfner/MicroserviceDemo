@@ -10,7 +10,6 @@ COPY ["OrderApi.Data/OrderApi.Data.csproj", "OrderApi.Data/"]
 COPY ["OrderApi.Domain/OrderApi.Domain.csproj", "OrderApi.Domain/"]
 COPY ["OrderApi.Service/OrderApi.Service.csproj", "OrderApi.Service/"]
 COPY ["OrderApi.Messaging.Receive/OrderApi.Messaging.Receive.csproj", "OrderApi.Messaging.Receive/"]
-COPY ["OrderApi.Database.Build/OrderApi.Database.Build.csproj", "OrderApi.Database.Build/"]
 COPY ["Tests/OrderApi.Test/OrderApi.Test.csproj", "Tests/OrderApi.Test/"]  
 COPY ["Tests/OrderApi.Service.Test/OrderApi.Service.Test.csproj", "Tests/OrderApi.Service.Test/"]  
 COPY ["Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj", "Tests/OrderApi.Data.Test/"] 
@@ -21,7 +20,6 @@ ARG PAT=localhost
 RUN sed -i "s|</configuration>|<packageSourceCredentials><MicroserviceDemoNugets><add key=\"Username\" value=\"PAT\" /><add key=\"ClearTextPassword\" value=\"${PAT}\" /></MicroserviceDemoNugets></packageSourceCredentials></configuration>|" nuget.config
 
 RUN dotnet restore "OrderApi/OrderApi.csproj" --configfile "./nuget.config"
-RUN dotnet restore "OrderApi.Database.Build/OrderApi.Database.Build.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/OrderApi.Test/OrderApi.Test.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/OrderApi.Service.Test/OrderApi.Service.Test.csproj" --configfile "./nuget.config"
 RUN dotnet restore "Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj" --configfile "./nuget.config"
@@ -32,10 +30,14 @@ RUN dotnet build "Tests/OrderApi.Test/OrderApi.Test.csproj" -c Release --no-rest
 RUN dotnet build "Tests/OrderApi.Service.Test/OrderApi.Service.Test.csproj" -c Release --no-restore
 RUN dotnet build "Tests/OrderApi.Data.Test/OrderApi.Data.Test.csproj" -c Release --no-restore
 
-FROM build AS dacpac
+# database build needs .NET Core 3.1
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS dacpac
 ARG BuildId=localhost
 LABEL dacpac=${BuildId}
 WORKDIR /src
+COPY ["OrderApi.Database.Build/OrderApi.Database.Build.csproj", "OrderApi.Database.Build/"]
+RUN dotnet restore "OrderApi.Database.Build/OrderApi.Database.Build.csproj"
+COPY . .
 RUN dotnet build "OrderApi.Database.Build/OrderApi.Database.Build.csproj" -c Release -o /dacpacs --no-restore
 
 FROM build AS test  
