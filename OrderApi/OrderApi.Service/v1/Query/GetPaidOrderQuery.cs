@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using MediatR;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 
 namespace OrderApi.Service.v1.Query
 {

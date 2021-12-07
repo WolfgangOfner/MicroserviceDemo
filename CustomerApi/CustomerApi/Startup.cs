@@ -49,17 +49,28 @@ namespace CustomerApi
             services.Configure<AzureServiceBusConfiguration>(serviceClientSettingsConfig);
 
             bool.TryParse(Configuration["BaseServiceSettings:UseInMemoryDatabase"], out var useInMemory);
+            bool.TryParse(Configuration["UseAadAuthentication"], out var useAadAuthentication);
 
             if (!useInMemory)
             {
-                services.AddDbContext<CustomerContext>(options =>
+                if (useAadAuthentication)
                 {
-                    SqlAuthenticationProvider.SetProvider(
-                        SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
-                        new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
-                    var sqlConnection = new SqlConnection(Configuration.GetConnectionString("CustomerDatabase"));
-                    options.UseSqlServer(sqlConnection);
-                });
+                    services.AddDbContext<CustomerContext>(options =>
+                    {
+                        SqlAuthenticationProvider.SetProvider(
+                            SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
+                            new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
+                        var sqlConnection = new SqlConnection(Configuration.GetConnectionString("CustomerDatabase"));
+                        options.UseSqlServer(sqlConnection);
+                    });
+                }
+                else
+                {
+                    services.AddDbContext<CustomerContext>(options =>
+                    {
+                        options.UseSqlServer(Configuration.GetConnectionString("CustomerDatabase"));
+                    });
+                }
             }
             else
             {
@@ -69,7 +80,7 @@ namespace CustomerApi
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
-            
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {

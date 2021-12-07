@@ -5,7 +5,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Models.v1;
 using OrderApi.Service.v1.Command;
 using OrderApi.Service.v1.Query;

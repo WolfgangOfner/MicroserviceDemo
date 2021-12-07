@@ -9,7 +9,7 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Controllers.v1;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Models.v1;
 using OrderApi.Service.v1;
 using OrderApi.Service.v1.Command;

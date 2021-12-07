@@ -1,0 +1,7 @@
+﻿apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: '{{ template "customerapi.name" . }}-azure-id-binding'
+spec:
+  azureIdentity: {{ .Values.aadAuthentication.managedIdentityName }}
+  selector: {{ template "customerapi.name" . }}

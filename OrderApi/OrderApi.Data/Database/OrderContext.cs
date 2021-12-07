@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 
 namespace OrderApi.Data.Database
 {

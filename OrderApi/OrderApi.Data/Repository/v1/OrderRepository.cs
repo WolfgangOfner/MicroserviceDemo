@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OrderApi.Data.Database;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 
 namespace OrderApi.Data.Repository.v1
 {

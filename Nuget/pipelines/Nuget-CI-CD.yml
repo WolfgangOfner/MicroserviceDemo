@@ -117,13 +117,13 @@ stages:
 #
 #          # Error: DotNetCore currently does not support using an encrypted Api Key.
 #          # For more information see https://github.com/microsoft/azure-pipelines-tasks/issues/7160
-#          - task: DotNetCoreCLI@2
-#            displayName: "Publish nuget packages to public feed"
-#            inputs:
-#              command: 'push'
-#              packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
-#              nuGetFeedType: 'external'
-#              publishFeedCredentials: 'PrimeNumber'
+#          #- task: DotNetCoreCLI@2
+#          #  displayName: "Publish nuget packages to public feed"
+#          #  inputs:
+#          #    command: 'push'
+#          #    packagesToPush: '$(Agent.BuildDirectory)/$(ArtifactNugetName)/*.nupkg'
+#          #    nuGetFeedType: 'external'
+#          #    publishFeedCredentials: 'PrimeNumber'
 #
 #          - task: DotNetCoreCLI@2
 #            displayName: Push Nuget Package

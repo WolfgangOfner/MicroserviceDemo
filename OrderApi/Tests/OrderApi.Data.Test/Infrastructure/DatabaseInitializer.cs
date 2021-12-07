@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using OrderApi.Data.Database;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 
 namespace OrderApi.Data.Test.Infrastructure
 {

@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "customerapi.fullname" . }}
   labels:
+    aadpodidbinding: {{ template "customerapi.name" . }}
     app: {{ template "customerapi.name" . }}
     chart: {{ template "customerapi.chart" . }}
     draft: {{ .Values.draft | default "draft-app" }}
@@ -18,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        aadpodidbinding: {{ template "customerapi.name" . }}
         app: {{ template "customerapi.name" . }}
         draft: {{ .Values.draft | default "draft-app" }}
         release: {{ .Release.Name }}

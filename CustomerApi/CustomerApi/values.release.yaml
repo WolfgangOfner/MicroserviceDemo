@@ -13,8 +13,8 @@ probes:
 imagePullSecrets:
   - name: acr-secret
 
-service:
-  type: ClusterIP
+#service:
+#  type: ClusterIP
   
 ingress:
   enabled: __IngressEnabled__
@@ -33,4 +33,10 @@ ingress:
         - __URL__
 
 envvariables:
-  tenantId: __TenantId__
+  TenantId: __TenantId__
+  useAadAuthentication: __UseAadAuthentication__
+
+aadAuthentication:
+  managedIdentityId: __ManagedIdentityId__
+  managedIdentityClientId: __ManagedIdentityClientId__  
+  managedIdentityName: __Managedidentity-aks__

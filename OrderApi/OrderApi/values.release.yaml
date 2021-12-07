@@ -33,3 +33,9 @@ ingress:
 
 envvariables:
   tenantId: __TenantId__
+  useAadAuthentication: __UseAadAuthentication__
+
+aadAuthentication:
+  managedIdentityId: __ManagedIdentityId__
+  managedIdentityClientId: __ManagedIdentityClientId__  
+  managedIdentityName: __Managedidentity-aks__

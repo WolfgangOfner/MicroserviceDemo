@@ -1,7 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using OrderApi.Data.Repository.v1;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Service.v1.Command;
 using Xunit;
 

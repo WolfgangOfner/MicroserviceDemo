@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 
 namespace OrderApi.Data.Repository.v1
 {

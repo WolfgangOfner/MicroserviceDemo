@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using FluentAssertions;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Infrastructure.Automapper;
 using OrderApi.Models.v1;
 using Xunit;

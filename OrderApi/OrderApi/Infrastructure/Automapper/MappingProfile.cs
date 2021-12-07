@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Models.v1;
 
 namespace OrderApi.Infrastructure.Automapper

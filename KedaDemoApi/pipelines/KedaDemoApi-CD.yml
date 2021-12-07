@@ -45,19 +45,19 @@ stages:
           steps:
           - download: KedaDemoApiBuild
             artifact: $(ArtifactName)
-          - template: templates/GetServiceBusConnectionString.yml
-            parameters:
-              azureSubscription: $(AzureSubscription)
-              resourceGroup: $(ClusterResourceGroup)
-              serviceBusNamespaceName: $(ServiceBusNamespaceName)
-              serviceBusQueueName: $(ServiceBusQueueName)
-              serviceBusQueueSasName: $(ServiceBusQueueSasName)
+          #- template: templates/GetServiceBusConnectionString.yml
+          #  parameters:
+          #    azureSubscription: $(AzureSubscription)
+          #    resourceGroup: $(ClusterResourceGroup)
+          #    serviceBusNamespaceName: $(ServiceBusNamespaceName)
+          #    serviceBusQueueName: $(ServiceBusQueueName)
+          #    serviceBusQueueSasName: $(ServiceBusQueueSasName)
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)
               azureSubscription: '$(AzureSubscription)'
               clusterResourceGroup: '$(ClusterResourceGroup)'
-              chartPackage: '$(ChartPackage)'              
+              chartPackage: '$(ChartPackage)'
               helmVersion: $(HelmVersion)
               k8sNamespace: $(K8sNamespace)
               kubernetesCluster: $(KubernetesCluster)

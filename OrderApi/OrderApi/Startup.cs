@@ -18,7 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OrderApi.Data.Database;
 using OrderApi.Data.Repository.v1;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using OrderApi.Infrastructure.Prometheus;
 using OrderApi.Messaging.Receive.Options.v1;
 using OrderApi.Messaging.Receive.Receiver.v1;
@@ -50,17 +50,28 @@ namespace OrderApi
             services.Configure<RabbitMqConfiguration>(serviceClientSettingsConfig);
 
             bool.TryParse(Configuration["BaseServiceSettings:UseInMemoryDatabase"], out var useInMemory);
+            bool.TryParse(Configuration["UseAadAuthentication"], out var useAadAuthentication);
 
             if (!useInMemory)
             {
-                services.AddDbContext<OrderContext>(options =>
+                if (useAadAuthentication)
                 {
-                    SqlAuthenticationProvider.SetProvider(
-                        SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
-                        new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
-                    var sqlConnection = new SqlConnection(Configuration.GetConnectionString("OrderDatabase"));
-                    options.UseSqlServer(sqlConnection);
-                });
+                    services.AddDbContext<OrderContext>(options =>
+                    {
+                        SqlAuthenticationProvider.SetProvider(
+                            SqlAuthenticationMethod.ActiveDirectoryDeviceCodeFlow,
+                            new CustomAzureSqlAuthProvider(Configuration["TenantId"]));
+                        var sqlConnection = new SqlConnection(Configuration.GetConnectionString("OrderDatabase"));
+                        options.UseSqlServer(sqlConnection);
+                    });
+                }
+                else
+                {
+                    services.AddDbContext<OrderContext>(options =>
+                    {
+                        options.UseSqlServer(Configuration.GetConnectionString("OrderDatabase"));
+                    });
+                }
             }
             else
             {
@@ -70,7 +81,7 @@ namespace OrderApi
             services.AddAutoMapper(typeof(Startup));
 
             services.AddMvc().AddFluentValidation();
-            
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
@@ -121,7 +132,7 @@ namespace OrderApi
             services.AddTransient<ICustomerNameUpdateService, CustomerNameUpdateService>();
 
             services.AddSingleton<MetricCollector>();
-            
+
             if (serviceClientSettings.Enabled)
             {
                 services.AddHostedService<CustomerFullNameUpdateReceiver>();

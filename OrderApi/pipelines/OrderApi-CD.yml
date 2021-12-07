@@ -26,6 +26,7 @@ variables:
   DatabaseName: Order
   HelmVersion: 3.5.0    
   KubernetesCluster: 'microservice-aks'
+  Managedidentity-aks: managedidentity-aks
   ReleaseValuesFile: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/values.release.yaml'
   ServiceBusNamespaceName: microservicedemo
   ServiceBusQueueName: CustomerQueue
@@ -33,6 +34,7 @@ variables:
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
   TlsSecretName: orderapi-tls
+  UseAadAuthentication: true
 
 stages:
 - stage: PR_Deploy
@@ -96,6 +98,7 @@ stages:
     DeploymentEnvironment: 'test'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
     ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    # ConnectionString: "Server=tcp:$(SQLServerName);Authentication=Active Directory Device Code Flow; Database=$(DatabaseName)-$(DeploymentEnvironment);"
     URL: $(DeploymentEnvironment).order.programmingwithwolfgang.com # replace with your service url
   jobs:
   - deployment: Web_Test
@@ -149,6 +152,7 @@ stages:
     DeploymentEnvironment: 'prod'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'
     ConnectionString: "Server=tcp:$(SQLServerName),1433;Initial Catalog=$(DatabaseName)-$(DeploymentEnvironment);Persist Security Info=False;User ID=$(DbUser);Password=$(DbPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+    # ConnectionString: "Server=tcp:$(SQLServerName);Authentication=Active Directory Device Code Flow; Database=$(DatabaseName)-$(DeploymentEnvironment);"
     URL: order.programmingwithwolfgang.com # replace with your service url
   jobs:
   - deployment: Web_Prod

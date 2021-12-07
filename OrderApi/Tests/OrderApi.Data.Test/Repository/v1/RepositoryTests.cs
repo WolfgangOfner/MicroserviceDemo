@@ -6,7 +6,7 @@ using FluentAssertions;
 using OrderApi.Data.Database;
 using OrderApi.Data.Repository.v1;
 using OrderApi.Data.Test.Infrastructure;
-using OrderApi.Domain;
+using OrderApi.Domain.Entities;
 using Xunit;
 
 namespace OrderApi.Data.Test.Repository.v1

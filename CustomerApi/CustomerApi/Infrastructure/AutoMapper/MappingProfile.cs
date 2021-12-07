@@ -11,6 +11,6 @@ namespace CustomerApi.Infrastructure.AutoMapper
             CreateMap<CreateCustomerModel, Customer>().ForMember(x => x.Id, opt => opt.Ignore());
 
             CreateMap<UpdateCustomerModel, Customer>();
-}
+        }
     }
 }

@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "orderapi.fullname" . }}
   labels:
+    aadpodidbinding: {{ template "orderapi.name" . }}
     app: {{ template "orderapi.name" . }}
     chart: {{ template "orderapi.chart" . }}
     draft: {{ .Values.draft | default "draft-app" }}
@@ -18,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        aadpodidbinding: {{ template "orderapi.name" . }}
         app: {{ template "orderapi.name" . }}
         draft: {{ .Values.draft | default "draft-app" }}
         release: {{ .Release.Name }}
