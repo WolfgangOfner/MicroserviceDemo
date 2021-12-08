@@ -7,6 +7,7 @@ pool:
 variables:  
   AksClusterName: microservice-aks
   AzureSubscription: AzureServiceConnection # replace with your subscription connection name
+  AzureServiceConnectionPayAsYouGo: AzureServiceConnectionPayAsYouGo # replace with your subscription connection name or use $(AzureSubscription) if you only have one
   AzureConnectionType: Azure Resource Manager 
   CertIssuerEmail: #<your email>  # replace with your email
   CertManagerNamespace: cert-manager 
@@ -281,11 +282,12 @@ steps:
       arguments: '--create-namespace'
 
   # For more information see https://www.programmingwithwolfgang.com/update-dns-records-in-an-azure-devops-pipeline
+  # This section uses a different AzureSubscription because my DNS Zone is in a different Subscription
   # Update DNS Records
   - task: AzureCLI@2
     displayName: "Delete CanNotDelete Lock on DNS Zone"
     inputs:
-      azureSubscription: '$(AzureSubscription)'
+      azureSubscription: '$(AzureServiceConnectionPayAsYouGo)'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -309,7 +311,7 @@ steps:
   - task: AzureCLI@2
     displayName: "Delete existing DND Records"
     inputs:
-      azureSubscription: '$(AzureSubscription)'
+      azureSubscription: '$(AzureServiceConnectionPayAsYouGo)'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -324,7 +326,7 @@ steps:
   - task: AzureCLI@2
     displayName: "Set DNS A records"
     inputs:
-      azureSubscription: '$(AzureSubscription)'
+      azureSubscription: '$(AzureServiceConnectionPayAsYouGo)'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -335,7 +337,7 @@ steps:
   - task: AzureCLI@2
     displayName: "Create CanNotDelete Lock on DNS Zone"
     inputs:
-      azureSubscription: '$(AzureSubscription)'
+      azureSubscription: '$(AzureServiceConnectionPayAsYouGo)'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -369,113 +371,113 @@ steps:
         --name AllowAzureServices `
         --start-ip-address 0.0.0.0 `
         --end-ip-address 255.255.255.255
-#  
-#  # Create Azure Service Bus 
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Service Bus Namespace"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az servicebus namespace create `
-#        --name $(ServiceBusNamespaceName) `
-#        --sku $(ServiceBusNamespaceSku) `
-#        --resource-group $(ResourceGroupName) `
-#        --location $(ResourceGroupLocation)
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Service Bus Queue"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az servicebus queue create `
-#        --name $(ServiceBusQueueName) `
-#        --namespace-name $(ServiceBusNamespaceName) `
-#        --resource-group $(ResourceGroupName)
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Service Bus Queue Send SAS"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az servicebus queue authorization-rule create `
-#        --name $(ServiceBusQueueSasSendName) `
-#        --namespace-name $(ServiceBusNamespaceName) `
-#        --queue-name $(ServiceBusQueueName) `
-#        --resource-group $(ResourceGroupName) `
-#        --rights Send
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Service Bus Queue Listen SAS"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az servicebus queue authorization-rule create `
-#        --name $(ServiceBusQueueSasListenName) `
-#        --namespace-name $(ServiceBusNamespaceName) `
-#        --queue-name $(ServiceBusQueueName) `
-#        --resource-group $(ResourceGroupName) `
-#        --rights Listen
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Service Bus Queue Manage SAS"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az servicebus queue authorization-rule create `
-#        --name $(ServiceBusQueueSasManageName) `
-#        --namespace-name $(ServiceBusNamespaceName) `
-#        --queue-name $(ServiceBusQueueNameKeda) `
-#        --resource-group $(ResourceGroupName) `
-#        --rights Manage Send Listen
-#  
-#  # Create Azure Function
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Storage Account"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az storage account create `
-#        --name $(StorageAccountName) `
-#        --resource-group $(ResourceGroupName)
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure App Service Plan"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az functionapp plan create `
-#        --name $(FunctionPlanName) `
-#        --resource-group $(ResourceGroupName) `
-#        --sku $(FunctionSku) `
-#        --is-linux true
-#
-#  - task: AzureCLI@2
-#    displayName: "Create Azure Function"
-#    inputs:
-#      azureSubscription: '$(AzureSubscription)'
-#      scriptType: 'pscore'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: |
-#        az functionapp create `
-#        --resource-group $(ResourceGroupName) `
-#        --plan $(FunctionPlanName) `
-#        --name $(FunctionName) `
-#        --storage-account $(StorageAccountName) `
-#        --functions-version $(FunctionVersion) `
-#        --os-type $(FunctionOs) `
-#        --runtime dotnet `
-#        --disable-app-insights true
+  
+  # Create Azure Service Bus 
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Namespace"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus namespace create `
+        --name $(ServiceBusNamespaceName) `
+        --sku $(ServiceBusNamespaceSku) `
+        --resource-group $(ResourceGroupName) `
+        --location $(ResourceGroupLocation)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue create `
+        --name $(ServiceBusQueueName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --resource-group $(ResourceGroupName)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue Send SAS"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue authorization-rule create `
+        --name $(ServiceBusQueueSasSendName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --queue-name $(ServiceBusQueueName) `
+        --resource-group $(ResourceGroupName) `
+        --rights Send
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue Listen SAS"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue authorization-rule create `
+        --name $(ServiceBusQueueSasListenName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --queue-name $(ServiceBusQueueName) `
+        --resource-group $(ResourceGroupName) `
+        --rights Listen
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue Manage SAS"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue authorization-rule create `
+        --name $(ServiceBusQueueSasManageName) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --queue-name $(ServiceBusQueueNameKeda) `
+        --resource-group $(ResourceGroupName) `
+        --rights Manage Send Listen
+  
+  # Create Azure Function
+  - task: AzureCLI@2
+    displayName: "Create Azure Storage Account"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az storage account create `
+        --name $(StorageAccountName) `
+        --resource-group $(ResourceGroupName)
+
+  - task: AzureCLI@2
+    displayName: "Create Azure App Service Plan"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az functionapp plan create `
+        --name $(FunctionPlanName) `
+        --resource-group $(ResourceGroupName) `
+        --sku $(FunctionSku) `
+        --is-linux true
+
+  - task: AzureCLI@2
+    displayName: "Create Azure Function"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az functionapp create `
+        --resource-group $(ResourceGroupName) `
+        --plan $(FunctionPlanName) `
+        --name $(FunctionName) `
+        --storage-account $(StorageAccountName) `
+        --functions-version $(FunctionVersion) `
+        --os-type $(FunctionOs) `
+        --runtime dotnet `
+        --disable-app-insights true
