@@ -14,7 +14,7 @@ variables:
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'kedademoapi'
   ArtifactName: 'KedaDemoApi'
-  ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
+  ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)/charts/kedademoapi
   BuildId: $(Build.BuildId)
   BuildNumber: $(GitVersion.FullSemVer)
   ClusterResourceGroup: MicroserviceDemo    
@@ -22,7 +22,7 @@ variables:
   HelmVersion: 3.5.0  
   Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository  
   KubernetesCluster: 'microservice-aks'
-  ReleaseValuesFile: '$(ArtifactSourceFolder)/values.release.yaml'    
+  ReleaseValuesFile: 'values.yaml'
 
 stages:
 - stage: Build  
