@@ -22,7 +22,7 @@ namespace KedaDemoApi.Controllers.v1
         }
 
         /// <summary>
-        ///     Action to add new messages to the queue.
+        ///     Action to start processing the queue items.
         /// </summary>
         /// <returns>Returns HTTP Code indicating success or failure of the operation</returns>
         /// <response code="200">Returned when all items are processed.</response>
@@ -47,7 +47,7 @@ namespace KedaDemoApi.Controllers.v1
         }
 
         /// <summary>
-        ///     Action to start processing the queue items.
+        ///     Action to add new messages to the queue.
         /// </summary>
         /// <returns>Returns HTTP Code indicating success or failure of the operation</returns>
         /// <response code="200">Returned when all items are processed.</response>
