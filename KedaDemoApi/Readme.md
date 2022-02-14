@@ -18,15 +18,15 @@ Another neat feature is that KEDA can scale deployments or jobs to 0. Scaling to
 I welcome feedback and comments from everyone
 
 ***Having trouble?***
-- Verify you have followed all written instructions in the blog posts [KEDA - Kubernetes Event-driven Autoscaling](https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscalling) and [Deploy KEDA and an Autoscaler using Azure DevOps Pipelines](https://www.programmingwithwolfgang.com/deploy-keda-and-autoscaler-using-azure-devops-pipelines).
+- Verify you have followed all written instructions in the blog posts [KEDA - Kubernetes Event-driven Autoscaling](https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscaling) and [Deploy KEDA and an Autoscaler using Azure DevOps Pipelines](https://www.programmingwithwolfgang.com/deploy-keda-and-autoscaler-using-azure-devops-pipelines).
 - Submit an issue with a detailed description of the problem.
 - Write a comment on the blog post where you have the problem.
 
 ## Further Documentation
 
-To learn how to use KEDA in Kubernetes and how to deploy the demo application, see my blog posts [KEDA - Kubernetes Event-driven Autoscaling](https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscalling) and [Deploy KEDA and an Autoscaler using Azure DevOps Pipelines](https://www.programmingwithwolfgang.com/deploy-keda-and-autoscaler-using-azure-devops-pipelines).
+To learn how to use KEDA in Kubernetes and how to deploy the demo application, see my blog posts [KEDA - Kubernetes Event-driven Autoscaling](https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscaling) and [Deploy KEDA and an Autoscaler using Azure DevOps Pipelines](https://www.programmingwithwolfgang.com/deploy-keda-and-autoscaler-using-azure-devops-pipelines).
 
-This repository is also used as demo application for the article "Level Up die Skalierung in Kubernetes mit KEDA" in the Windows Developer Magazin 3/2022.
+This repository is also used as demo application for the article "Level Up die Skalierung in Kubernetes mit KEDA" in the Windows Developer Magazin 4/2022.
 
 All applications in this MicroserviceDemo repository are used for the [Microservices - From Zero to Hero](https://www.programmingwithwolfgang.com/microservice-series-from-zero-to-hero) series.
 
