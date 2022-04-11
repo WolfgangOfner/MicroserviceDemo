@@ -39,6 +39,7 @@ namespace CustomerApi.Controllers.v1
         {
             try
             {
+                createCustomerModel.FirstName= string.Format("[0}", createCustomerModel.FirstName);
                 return await _mediator.Send(new GetCustomersQuery());
             }
             catch (Exception ex)
