@@ -34,6 +34,7 @@ variables:
   ServiceBusNamespaceName: microservicedemo # replace with unique name
   ServiceBusNamespaceSku: Basic
   ServiceBusQueueName: CustomerQueue
+  ServiceBusQueueNameKeda: KedaDemo
   ServiceBusQueueSasListenName: ReceiveKey
   ServiceBusQueueSasSendName: SendKey  
   ServiceBusQueueSasManageName: ManageKey
@@ -309,7 +310,7 @@ steps:
         Write-Host "##vso[task.setvariable variable=IngressIp;]$ingressIp"        
 
   - task: AzureCLI@2
-    displayName: "Delete existing DND Records"
+    displayName: "Delete existing DNS Records"
     inputs:
       azureSubscription: '$(AzureServiceConnectionPayAsYouGo)'
       scriptType: 'pscore'
@@ -387,7 +388,7 @@ steps:
         --location $(ResourceGroupLocation)
 
   - task: AzureCLI@2
-    displayName: "Create Azure Service Bus Queue"
+    displayName: "Create Azure Service Bus Queue for Customer"
     inputs:
       azureSubscription: '$(AzureSubscription)'
       scriptType: 'pscore'
@@ -398,6 +399,18 @@ steps:
         --namespace-name $(ServiceBusNamespaceName) `
         --resource-group $(ResourceGroupName)
 
+  - task: AzureCLI@2
+    displayName: "Create Azure Service Bus Queue for Keda"
+    inputs:
+      azureSubscription: '$(AzureSubscription)'
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az servicebus queue create `
+        --name $(ServiceBusQueueNameKeda) `
+        --namespace-name $(ServiceBusNamespaceName) `
+        --resource-group $(ResourceGroupName)
+        
   - task: AzureCLI@2
     displayName: "Create Azure Service Bus Queue Send SAS"
     inputs:

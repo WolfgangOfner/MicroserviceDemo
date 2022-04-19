@@ -22,7 +22,7 @@ variables:
   HelmVersion: 3.5.0  
   Repository: 'wolfgangofner/$(ApiName)' # '<YourACRName>.azurecr.io/<YourRepositoryName>' # replace with your repository  
   KubernetesCluster: 'microservice-aks'
-  ReleaseValuesFile: '$(ArtifactSourceFolder)/values.release.yaml'    
+  ReleaseValuesFile: '$(ChartPath)/values.yaml'    
 
 stages:
 - stage: Build  

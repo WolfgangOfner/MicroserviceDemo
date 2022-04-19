@@ -26,7 +26,7 @@ I welcome feedback and comments from everyone
 
 To learn how to use KEDA in Kubernetes and how to deploy the demo application, see my blog posts [KEDA - Kubernetes Event-driven Autoscaling](https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscaling) and [Deploy KEDA and an Autoscaler using Azure DevOps Pipelines](https://www.programmingwithwolfgang.com/deploy-keda-and-autoscaler-using-azure-devops-pipelines).
 
-This repository is also used as demo application for the article "Ein Level Up die Skalierung in Kubernetes" in the [Windows Developer Magazin 4/2022](https://entwickler.de/reader/reading/windows-developer/4.2022/161391038f3a1bd00059a8cb). Furthermore, I used this application for my presentation at the BASTA! Spring 2022 in Frankfurt. You can find the slides of the presentation (in German) in the [Basta Presentation folder](https://github.com/WolfgangOfner/MicroserviceDemo/tree/master/KedaDemoApi/Basta%20Presentation).
+This repository is also used as demo application for the article "Level Up die Skalierung in Kubernetes mit KEDA" in the Windows Developer Magazin 3/2022.
 
 All applications in this MicroserviceDemo repository are used for the [Microservices - From Zero to Hero](https://www.programmingwithwolfgang.com/microservice-series-from-zero-to-hero) series.
 

@@ -1,19 +1,13 @@
-# Default values for orderapi.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 fullnameOverride: orderapi
 replicaCount: 1
 image:
-  repository: wolfgangofner/orderapi
-  tag: latest
+  repository: __Repository__
+  tag: __BuildNumber__
   pullPolicy: IfNotPresent
-imagePullSecrets: []
-  # Optionally specify an array of imagePullSecrets.
-  # Secrets must be manually created in the namespace.
-  # ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
-  #
-  # This uses credentials from secret "myRegistryKeySecretName".
-  # - name: myRegistryKeySecretName
+
+imagePullSecrets:
+  - name: acr-secret
+
 service:
   type: LoadBalancer
   port: 80
@@ -22,21 +16,23 @@ deployment:
   containerPort: 80
 
 probes:
-  enabled: false
+  enabled: true
 
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/tls-acme: "true"
+  enabled: __IngressEnabled__
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true" 
+    cert-manager.io/cluster-issuer: letsencrypt
+  namespace: __K8sNamespace__
   path: /
   pathType: Prefix
-  namespace: orderapi
   hosts:
-    - VALUE_TO_OVERRIDE
+    - __URL__
   tls:
-    - secretName: VALUE_TO_OVERRIDE
+    - secretName: __TlsSecretName__
       hosts:
-        - VALUE_TO_OVERRIDE
+        - __URL__
 
 hpa:
   enabled: true
@@ -44,18 +40,10 @@ hpa:
   maxReplicas: 10
   averageCpuUtilization: 50
 
-secrets: {}
-  # Optionally specify a set of secret objects whose values
-  # will be injected as environment variables by default.
-  # You should add this section to a file like secrets.yaml
-  # that is explicitly NOT committed to source code control
-  # and then include it as part of your helm install step.
-  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
-  #
-  # This creates a secret "mysecret" and injects "mypassword"
-  # as the environment variable mysecret_mypassword=password.
-  # mysecret:
-  #   mypassword: password
+secrets:
+  connectionstrings:
+    ConnectionStrings__OrderDatabase: __ConnectionString__
+
 resources:
    limits:
     cpu: 0.3
@@ -70,4 +58,11 @@ tolerations: []
 affinity: {}
 
 envvariables:
+  tenantId: __TenantId__
   rabbitmq__enabled: false
+# useAadAuthentication: __UseAadAuthentication__
+
+#aadAuthentication:
+#  managedIdentityId: __ManagedIdentityId__
+#  managedIdentityClientId: __ManagedIdentityClientId__  
+#  managedIdentityName: __Managedidentity-aks__  

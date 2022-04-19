@@ -27,14 +27,14 @@ variables:
   HelmVersion: 3.5.0 
   KubernetesCluster: 'microservice-aks'
   Managedidentity-aks: managedidentity-aks
-  ReleaseValuesFile: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/values.release.yaml'
+  ReleaseValuesFile: '$(Pipeline.Workspace)/CustomerApiBuild/CustomerApi/values.yaml'
   ServiceBusNamespaceName: microservicedemo
   ServiceBusQueueName: CustomerQueue
   ServiceBusQueueSasName: SendKey
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
   TlsSecretName: customerapi-tls
-  UseAadAuthentication: true
+  UseAadAuthentication: false
   
 stages:
 - stage: PR_Deploy
@@ -110,19 +110,19 @@ stages:
           steps:
           - download: CustomerApiBuild
             artifact: $(ArtifactName)
-          - template: templates/GetServiceBusConnectionString.yml
-            parameters:
-              azureSubscription: $(AzureSubscription)
-              resourceGroup: $(ClusterResourceGroup)
-              serviceBusNamespaceName: $(ServiceBusNamespaceName)
-              serviceBusQueueName: $(ServiceBusQueueName)
-              serviceBusQueueSasName: $(ServiceBusQueueSasName)
+          #- template: templates/GetServiceBusConnectionString.yml
+          #  parameters:
+          #    azureSubscription: $(AzureSubscription)
+          #    resourceGroup: $(ClusterResourceGroup)
+          #    serviceBusNamespaceName: $(ServiceBusNamespaceName)
+          #    serviceBusQueueName: $(ServiceBusQueueName)
+          #    serviceBusQueueSasName: $(ServiceBusQueueSasName)
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)
               azureSubscription: '$(AzureSubscription)'
               clusterResourceGroup: '$(ClusterResourceGroup)'
-              chartPackage: '$(ChartPackage)'              
+              chartPackage: '$(ChartPackage)'
               helmVersion: $(HelmVersion)
               k8sNamespace: $(K8sNamespace)
               kubernetesCluster: $(KubernetesCluster)
