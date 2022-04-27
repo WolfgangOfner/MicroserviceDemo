@@ -24,7 +24,6 @@ variables:
   KedaVersion: 2.4
   Kubernetesversion: '1.22.6'
   KubectlVersion: '1.22.6'
-  LokiVersion: '2.0.3'
   LokiNamespace: loki-grafana
   NetworkPlugin: azure
   NodeCount: 1
@@ -212,7 +211,7 @@ steps:
       kubernetesCluster: '$(AksClusterName)'
       useClusterAdmin: true
       command: 'repo'
-      arguments: 'add loki https://grafana.github.io/loki/charts'
+      arguments: 'add grafana https://grafana.github.io/helm-charts'
 
   - task: HelmDeploy@0
     displayName: "Install Loki Grafana (Helm repo update)"
@@ -225,22 +224,21 @@ steps:
       command: 'repo'
       arguments: 'update'
 
-#  - task: HelmDeploy@0
-#    displayName: "Install Loki Grafana"
-#    inputs:
-#      connectionType: '$(AzureConnectionType)'
-#      azureSubscription: '$(AzureSubscription)'
-#      azureResourceGroup: '$(ResourceGroupName)'
-#      kubernetesCluster: '$(AksClusterName)'
-#      useClusterAdmin: true
-#      namespace: '$(LokiNamespace)'
-#      command: 'upgrade'
-#      chartType: 'Name'
-#      chartName: 'loki/loki-stack'
-#      chartVersion: '$(LokiVersion)'
-#      releaseName: 'loki'
-#      overrideValues: 'grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=true,prometheus.server.persistentVolume.enabled=true,loki.persistence.enabled=true,loki.persistence.size=10Gi'
-#      arguments: '--create-namespace'
+  - task: HelmDeploy@0
+    displayName: "Install Loki Grafana"
+    inputs:
+      connectionType: '$(AzureConnectionType)'
+      azureSubscription: '$(AzureSubscription)'
+      azureResourceGroup: '$(ResourceGroupName)'
+      kubernetesCluster: '$(AksClusterName)'
+      useClusterAdmin: true
+      namespace: '$(LokiNamespace)'
+      command: 'upgrade'
+      chartType: 'Name'
+      chartName: 'grafana/loki-stack'
+      releaseName: 'loki'
+      overrideValues: 'grafana.enabled=true,prometheus.enabled=true,prometheus.alertmanager.persistentVolume.enabled=true,prometheus.server.persistentVolume.enabled=true,loki.persistence.enabled=true,loki.persistence.size=10Gi'
+      arguments: '--create-namespace'
 
   # Install KEDA
   # For more information see https://www.programmingwithwolfgang.com/keda-kubernetes-event-driven-autoscalling/
