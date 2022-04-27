@@ -14,7 +14,6 @@ variables:
   AzureSubscription: 'AzureServiceConnection' # Name of the Service Connection
   ApiName: 'orderapi'
   ArtifactName: 'OrderApi'
-  ArtifactSourceFolder: $(ArtifactName)/$(ArtifactName)
   BuildId: $(Build.BuildId)
   BuildNumber: $(GitVersion.FullSemVer)
   ClusterResourceGroup: MicroserviceDemo    
@@ -50,4 +49,3 @@ stages:
           artifactStagingDirectory: $(Build.ArtifactStagingDirectory)
           artifactName: $(ArtifactName)
           helmVersion: $(HelmVersion)
-          sourceFolder: $(ArtifactSourceFolder)

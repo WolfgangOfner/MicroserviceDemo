@@ -26,9 +26,6 @@ parameters:
   - name: releaseValuesFile
     type: string
     default: 
-  - name: sourceFolder
-    type: string
-    default:
 
 steps:
   - task: Tokenizer@0

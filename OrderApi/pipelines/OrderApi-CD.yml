@@ -24,13 +24,10 @@ variables:
   ClusterResourceGroup: MicroserviceDemo  
   ChartPackage: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/orderapi-$(resources.pipeline.OrderApiBuild.runname).tgz'  
   DatabaseName: Order
-  HelmVersion: 3.5.0    
+  HelmVersion: 3.5.0
   KubernetesCluster: 'microservice-aks'
   Managedidentity-aks: managedidentity-aks
   ReleaseValuesFile: '$(Pipeline.Workspace)/OrderApiBuild/OrderApi/values.yaml'
-  ServiceBusNamespaceName: microservicedemo
-  ServiceBusQueueName: CustomerQueue
-  ServiceBusQueueSasName: ReceiveKey
   SQLServerName: wolfgangmicroservicedemosql.database.windows.net # replace with your server url  
   IngressEnabled: true
   TlsSecretName: orderapi-tls
@@ -109,14 +106,7 @@ stages:
         deploy:
           steps:
           - download: OrderApiBuild
-            artifact: $(ArtifactName)
-          #- template: templates/GetServiceBusConnectionString.yml
-          #  parameters:
-          #    azureSubscription: $(AzureSubscription)
-          #    resourceGroup: $(ClusterResourceGroup)
-          #    serviceBusNamespaceName: $(ServiceBusNamespaceName)
-          #    serviceBusQueueName: $(ServiceBusQueueName)
-          #    serviceBusQueueSasName: $(ServiceBusQueueSasName)
+            artifact: $(ArtifactName)          
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)
@@ -163,14 +153,7 @@ stages:
         deploy:
           steps:
           - download: OrderApiBuild
-            artifact: $(ArtifactName)
-          - template: templates/GetServiceBusConnectionString.yml
-            parameters:
-              azureSubscription: $(AzureSubscription)
-              resourceGroup: $(ClusterResourceGroup)
-              serviceBusNamespaceName: $(ServiceBusNamespaceName)
-              serviceBusQueueName: $(ServiceBusQueueName)
-              serviceBusQueueSasName: $(ServiceBusQueueSasName)
+            artifact: $(ArtifactName)          
           - template: templates/DeployHelmPackage.yml
             parameters:
               apiName: $(ApiName)

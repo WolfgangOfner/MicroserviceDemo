@@ -18,10 +18,11 @@ parameters:
 steps:
   - task: AzureCLI@2
     displayName: "Read Connection String for Azure Service Bus Queue"
+    continueOnError: true
     inputs:
       azureSubscription: '${{ parameters.azureSubscription }}'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
-      inlineScript: |        
+      inlineScript: |
         $connectionString = "$(az servicebus queue authorization-rule keys list -g '${{ parameters.resourceGroup }}' --namespace-name '${{ parameters.serviceBusNamespaceName }}' -n '${{ parameters.serviceBusQueueSasName }}' --queue-name '${{ parameters.serviceBusQueueName }}' --query primaryConnectionString)"
         Write-Host "##vso[task.setvariable variable=AzureServiceBusConnectionString;]$connectionString"
