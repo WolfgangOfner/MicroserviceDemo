@@ -60,13 +60,13 @@ stages:
     - task: AzureFunctionAppContainer@1 
       inputs:
         azureSubscription: 'AzureServiceConnection'
-        appName: 'microservicedemoOrderApiMessagingReceive'
+        appName: 'OrderApiMessagingReceive'
         imageName: '$(Repository):$(Tag)'
 
     - task: AzureAppServiceSettings@1
       inputs:
         azureSubscription: 'AzureServiceConnection'
-        appName: 'microservicedemoOrderApiMessagingReceive'
+        appName: 'OrderApiMessagingReceive'
         resourceGroupName: 'MicroserviceDemo'
         appSettings: |
           [

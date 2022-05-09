@@ -136,7 +136,7 @@ stages:
               releaseValuesFile: '$(ReleaseValuesFile)' 
  
   - deployment: Database_Test
-    dependsOn: Web_Test    
+    dependsOn: Web_Test
     condition: and(succeeded(), startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master'))
     displayName: 'Deploy the test database'   
     environment: database-test
@@ -154,7 +154,7 @@ stages:
 
 - stage: Prod
   dependsOn: Test
-  condition: and(succeeded(), startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master'))
+  condition:  startsWith(variables['resources.pipeline.CustomerApiBuild.sourcebranch'], 'refs/heads/master')
   variables:
     DeploymentEnvironment: 'prod'
     K8sNamespace: '$(ApiName)-$(DeploymentEnvironment)'

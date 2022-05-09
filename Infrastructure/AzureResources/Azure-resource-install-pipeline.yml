@@ -12,7 +12,7 @@ variables:
   CertIssuerEmail: #<your email>  # replace with your email
   CertManagerNamespace: cert-manager 
   DnsLockName: DeleteDns 
-  DnsRecords: "@('*.customer','*.order','*.kedademo')" # replace with your A records
+  DnsRecords: "@('*.customer','*.order','*.kedademo', 'customer','order','kedademo')" # replace with your A records
   DnsZoneName: programmingwithwolfgang.com # replace with your DNS zone
   FunctionName: OrderApiMessagingReceive # replace with unique name
   FunctionOs: Linux
