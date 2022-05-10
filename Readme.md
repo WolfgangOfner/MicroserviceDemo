@@ -1,3 +1,5 @@
+# Microservice Series - From Zero to Hero
+
 This repo is used for my 65 blog post series "Microservices - From Zero to Hero". It started out as .NET Core 3.1 project and has been upgraded to .NET 6 since then. The following tools and technologies are used:
 
 - .NET 6
