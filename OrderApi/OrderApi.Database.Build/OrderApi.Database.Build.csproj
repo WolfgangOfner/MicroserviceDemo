@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.SqlProj/1.11.4">
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.0.0">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SqlServerVersion>SqlAzure</SqlServerVersion>
