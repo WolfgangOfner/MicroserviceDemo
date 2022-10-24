@@ -28,7 +28,7 @@ using Prometheus;
 
 namespace CustomerApi
 {
-    //first checkin
+    //testing CI checkin
     public class Startup
     {
         public Startup(IConfiguration configuration)
