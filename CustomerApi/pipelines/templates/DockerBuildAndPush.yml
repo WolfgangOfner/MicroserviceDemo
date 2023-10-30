@@ -20,7 +20,7 @@ parameters:
 
 steps:
   - task: Docker@2
-    displayName: 'Build Docker Container'
+    displayName: 'Run Tests'
     inputs:
       containerRegistry: ${{ parameters.containerRegistry }}
       repository: ${{ parameters.repository }}
@@ -30,8 +30,8 @@ steps:
       tags: |      
         ${{ parameters.tag }}
         latest
-      arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
-  
+      arguments: '--target test --build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
+
   - pwsh: |
      $id=docker images --filter "label=test=${{ parameters.buildId }}" -q | Select-Object -First 1
      docker create --name testcontainer $id
@@ -53,6 +53,19 @@ steps:
       reportDirectory: '$(System.DefaultWorkingDirectory)/testresults/coverage/reports'
     displayName: 'Publish code coverage results'
 
+  - task: Docker@2
+    displayName: 'Build Database'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'build'
+      Dockerfile: '**/${{ parameters.artifactName }}/${{ parameters.artifactName }}/Dockerfile'
+      buildContext: ${{ parameters.artifactName }}
+      tags: |      
+        ${{ parameters.tag }}
+        latest
+      arguments: '--target dacpac --build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
+
   - pwsh: |
       $id=docker images --filter "label=dacpac=${{ parameters.buildId }}" -q | Select-Object -First 1
       docker create --name dacpaccontainer $id
@@ -65,6 +78,19 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/dacpacs'
       ArtifactName: 'dacpacs'    
     displayName: 'Publish DACPAC'
+
+  - task: Docker@2
+    displayName: 'Build Docker Container'
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry }}
+      repository: ${{ parameters.repository }}
+      command: 'build'
+      Dockerfile: '**/${{ parameters.artifactName }}/${{ parameters.artifactName }}/Dockerfile'
+      buildContext: ${{ parameters.artifactName }}
+      tags: |      
+        ${{ parameters.tag }}
+        latest
+      arguments: '--build-arg BuildId=${{ parameters.buildId }} --build-arg PAT=${{ parameters.patMicroserviceDemoNugetsFeed }}'
 
   - task: Docker@2
     displayName: 'Push Docker Container'
