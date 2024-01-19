@@ -315,7 +315,7 @@ steps:
       scriptLocation: 'inlineScript'
       inlineScript: |
         ForEach ($dnsRecord in $(DnsRecords)) {
-          $ipAddress = az network dns record-set a show -g $(ResourceGroupName) -z $(DnsZoneName) --name $dnsRecord -o json --query aRecords[0].ipv4Address 
+          $ipAddress = az network dns record-set a show -g $(ResourceGroupName) -z $(DnsZoneName) --name $dnsRecord -o json --query ARecords[0].ipv4Address 
           if ($ipAddress) 
           {         
             az network dns record-set a remove-record -g $(ResourceGroupName) -z $(DnsZoneName) --record-set-name $dnsRecord --ipv4-address $ipAddress
