@@ -80,3 +80,10 @@ stages:
           ]
       displayName: Update App Settings
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+
+rajendra:
+  -task: rajendra prasad
+  - task : bulid
+  - task : deploye
+  - task : release
