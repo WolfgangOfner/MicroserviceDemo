@@ -86,3 +86,4 @@ rajendra:
   -task: rajendra prasad
   - task : bulid
   - task : deploye
+  - task : release
