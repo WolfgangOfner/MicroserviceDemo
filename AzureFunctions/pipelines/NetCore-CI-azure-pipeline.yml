@@ -80,3 +80,6 @@ stages:
           ]
       displayName: Update App Settings
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+
+#commited new changes
